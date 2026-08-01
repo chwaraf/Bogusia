@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">Bogusia</string>
-    <string name="title_activity_main">Bogusia</string>
-    <string name="package_name">com.bogusia.pilematch</string>
-    <string name="custom_url_scheme">com.bogusia.pilematch</string>
-</resources>

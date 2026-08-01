@@ -1,0 +1,1 @@
+{"name":"pile-match-bogusia","version":"4.17.0","description":"Final: big fixed 84x110 no Duze toggle, default no extra borders, dots bigger inside block, concise sets, MC Block smaller than block, all build files","dependencies":{"@capacitor/core":"^6.1.2","@capacitor/cli":"^6.1.2","@capacitor/android":"^6.1.2","@capacitor/haptics":"^6.0.1"}}
