@@ -76,3 +76,84 @@ For a release build: `./gradlew assembleRelease` after adding a signing config
 ## Portability (2026-07-31)
 - pile-match-project/www synced to the current game (v4.28, 11 tile PNGs); machine-specific android/local.properties removed from the clone.
 - Turnkey local build: /home/user/build-apk.sh (syncs www from bogusia-web, npm install, cap sync, gradlew assembleDebug) — verified end-to-end (BUILD SUCCESSFUL, APK contains v4.28). Instructions: /home/user/BUILD_APK.md (toolchain: JDK 17, Node 18+, Android SDK platform-tools + platforms;android-34 + build-tools;34.0.0; Windows steps included).
+
+## v4.29 (2026-07-31)
+- Sound: AudioContext is now resumed on every beep plus on pointerdown/touchstart/keydown/focus/pageshow and when the app returns from background (visibilitychange) — fixes "sound gone or very quiet" after pausing the app; beep nodes are disconnected after playback; base gain slightly raised (0.28->0.34).
+- Default number tiles: removed the strong white glow halo — numbers are plain dark black again and readable at a glance.
+- UI icons enlarged: footer buttons 19px icons with 44px+ touch height, header/stats/lang fonts bumped.
+- The 5 left footer buttons now have text labels under the icons (Hint/Undo/Shuffle/Layout/Results — PL: Podpowiedź/Cofnij/Tasuj/Układ/Wyniki).
+- Full EN/PL pass: previously hardcoded settings rows (Random set, Free marks, Debug info, Tester) are localized; settings note refreshed.
+- Bricks layout reduced to 74 tiles (37 pairs): symmetric 8x6 base + centered 6x3 level + centered 4x2 cap — fits the screen neatly.
+- Textures/borders/structured layers untouched.
+- APK: Bogusia-v4.29.apk (same debug signature). Old v4.28 APK removed.
+
+## v4.30 (2026-07-31)
+- **Points system** (per user request):
+  - Match = `round(10 × speedMult) + streakBonus`; speedMult = `1 + clamp((10 - dt)/5, 0, 2)` where dt = seconds since last match (instant rematch ≈ ×3 = 30 pts, ≥10 s = ×1). Streak (matches within 5 s) ≥ 3 adds `min(25, (streak-2)×5)` bonus.
+  - New score box ⭐ in the **middle of the bottom bar** with count-up animation + scale bump.
+  - Flying score FX: on match a gold `+N` chip pops at the pair midpoint (spring overshoot) then ease-ins (gravity) into the score box; shuffle spawns a red `−N` chip from the Shuffle button. WAAPI keyframes, `.score-fx.plus/.minus`.
+  - **Shuffle penalty** = `min(60, 10 + 8×(shufflesDone-1) + ceil(tilesLeft/6))` — scales with tiles left and shuffle count; resets streak.
+  - Score saved into `pm_results`; win message shows score.
+- **Wyniki list** = leaderboard: sorted by score desc, rank medal (#1 gold/#2 silver/#3 bronze) shown **before points**, time/moves demoted to meta line; tapping an entry replays that layout (note updated in both langs).
+- **New sets `def2` / `def3`** (white_basic.jpg / white_basic5.jpg attachments): cut out from uniform dark bg (lum thr 72, min/max open-close, 1.2 px feather) to transparent `tiles/def2_block.png` (502×666) / `tiles/def3_block.png` (585×770). Flat 43.9-lum cast-shadow band on right/bottom was excluded on purpose (tiles get drop-shadow in game). Render via same DOM number/dots code as Default (`bgFile` switch), **match-by-number** (`pairKey` extended), added to all 6 borderless block-set CSS groups, random pool, hidden select, debug SET_LABELS.
+- **Modern set picker**: `select` hidden, `#set-grid` 3-col card grid (icon + name, active card green + ✓ badge) — `SET_ORDER/SET_ICONS/SET_NAMES`, `buildSetGrid()/syncSetGrid()` (called from applyLang + applyPerfMode so Random rolls stay in sync).
+- **i18n fixes**: `label-lang` now "🌐 Language"/"🌐 Język" (was hardcoded Język); settings title "⚙ Settings"/"⚙ Ustawienia" (was "Deluxe"); results title/Close/Clear/note now localized; new keys: langLbl, setLbl, ptsShort, clear, resultsNote; set names localized (Food→Jedzenie, Default→Domyślny etc.).
+- **Slimmer bottom bar**: footer buttons 50×44→45×41 px, padding/gaps trimmed (icon 19 px and 9 px labels kept), zoom group slimmer — score box fits the middle.
+- Test hook `window.__pm` (state/pairKey/onClick/spawnScoreFx/...) for headless verification.
+- Verified via headless Chromium screenshots: def2/def3 boards, real-match +N flight + score 10 in box, EN settings grid, PL settings, ranked results, Default regression (no phantom borders anywhere).
+
+## v4.31 (2026-07-31)
+- **def2/def3 re-import with own structure** (user: blocks carry their own 3D, no CSS fakery): cutout now keeps the dark structured shadow band on right/bottom (L-strip `lum<56` hugging the face bbox, `lum>62` face) while excluding only the flat 58-lum background; def2_block.png 536×698 (aspect 0.768 ≈ tile 0.764), def3 585×776. No borders/layers added in CSS.
+- **New start screen** (`#start-overlay`) at boot: language seg (EN/PL moved here from playing header), layout picker (persists `pm_layout`, preselects last), full set grid (shared builder), big Start button, best-score-per-layout line (`updateStartBest`, from pm_results). Audio unlocked on Start click.
+- **Lang buttons removed from playing header**; `.langbtn`/`data-lang` generic binding syncs EN/PL active state across start screen + settings.
+- **No-moves rework**: `scheduleNoMovesCheck(delay)` (debounced, fresh `computeFreeCache`, guards overlay already shown / game over) called after match, both undo paths, shuffle, hint; new dedicated `#stuck-overlay` with **🔀 Shuffle (primary) / ↩ Undo / ✖ Close** buttons — Shuffle re-checks after 450 ms and re-opens if still dead.
+- **Score FX tuning**: chips bigger (22 px), hold longer before the gravity drop (4-keyframe timeline, pop 20%, hold 44%, fall, 1080 ms).
+- **Volume range 0–150%** (slider max 150), louder curve: gain = (vol/100)*0.5 (100% ≈ +47% louder than before).
+- **Default-family faces are dots-only now** (default/def2/def3): numerals removed, single centered 15 px dot cluster (max-width 64 px, padding-bottom 20 for block lip). Match-by-number logic unchanged.
+- Fix: `syncSetGrid` selector `#set-grid` → `.set-grid` so the start-screen grid also shows the ✓ active highlight.
+- Verified headless: start EN (Default 2 ✓) / start PL (full localization), def2/def3 with structure band in game, dots-only Default, forced-stuck overlay with working buttons.
+
+## v4.32 (2026-07-31)
+- **New game mode: Hold 5 bar** (Tile-Master style), enabled via Settings → 🧩 Mode (Classic / Hold 5, persisted `pm_mode`, mode switch restarts current layout):
+  - Tap a free tile → it flies (WAAPI ghost, arc, scale-down) into the 5-slot holding bar above the footer; reserved-slot push avoids landing collisions.
+  - When 2 landed tiles share a pairKey they pop-vanish — full points pipeline reused (`computeMatchPts` speed multiplier + streak), chip flies from the bar to the score box; `moves` counts picks, win at last pair.
+  - Undo returns the most recent landed pick to the board (`doBarUndo`); footer Undo routes by mode. Shuffle still works (penalty) on board tiles only.
+  - **Bar-full alert** (`#barfull-overlay`): fires when 5 landed items have no pair; Undo/Shuffle/Close buttons; red bar flash on illegal picks; classic no-moves check is disabled in this mode (parking is the point), `scheduleNoMovesCheck` → `checkBarFull` instead.
+  - Visuals match the game: dark bar strip + dashed cream slots, mini faces rendered from the same `getFace` (scale 0.548).
+- **Cream alert buttons** (`.btn-cream`: same look as footer Tasuj — cream gradient + icon over 9 px label) for the Stuck and Bar-full alerts; Stuck Shuffle is no longer the odd green one.
+- **Settings squeeze** (all visible without scrolling): rows 10→5 px padding, toggles 44×26→38×22, six toggles folded into a 3×2 `.tgl-grid`, smaller set cards (4 px pad), card padding 22→16, h2 20→18, narrower volume slider; added **🧩 Mode** row (Classic/Hold 5 segment, `.modebtn` wired + `syncModeSeg` in applyPerfMode/applyLang i18n).
+- Verified headless: bar gameplay (2 parked items, +10 chip, score 10), bar-full overlay, squeezed settings (no scroll, all rows), cream Stuck buttons, classic def2 regression.
+
+## v4.33 (2026-07-31)
+- **Hold bar moved to the TOP** (`#hold-bar` between header and board, bottom-border + shadow).
+- **Hold 5 now has its own layout** — "Pile 40" / "Sterta 40" (`scatter`), generated by `makeScatterTiles()` from the user's sketch: 40 tiles loosely scattered over ~5.4×8.2 units with natural overlaps, ~40% stacked on a second layer; a fresh random pile every game; hidden from Classic pickers, auto-forced in Hold 5 mode (Classic `genGame('scatter')` falls back to senior); results replay supports scatter.
+- **Bar-mode freedom rule**: in Hold 5 a tile is pickable whenever nothing covers it from above (genre-standard; left/right rule kept only for Classic). Verified with food/mine13/def2 sets — "every set can be used there".
+- i18n/notes bumped; montage includes the user's sketch panel next to the implementation.
+
+## v4.34 — Hold 5 bar rework (2026-08-01)
+- **Win detection fixed (root cause)**: pairs in the bar could be double-counted when a second landing happened inside the 240ms vanish window → pairsLeft went negative (never-ending games) or hit 0 early (premature win). Bar is now a fixed 5-pocket array; items marked `vanishing` immediately and excluded from matching; win fires exactly at pairsLeft==0. Added `gameId` token so flights/vanishes from a reset game can't corrupt state. Verified by auto-clearing a whole 36-tile pile: win at exactly 36 moves / 18 pairs.
+- **Fluid arc flight**: stones fly to the bar in ONE motion along a quadratic curve that bows LEFT or RIGHT depending on pocket position (with slight lift + tumble rotation), 430ms, eased timing baked into the path. Ghost measures the tile BEFORE it shrinks.
+- **Stone bar design**: slab is now a grey stone bar (`#hold-bar-inner`) with 5 carved dark pockets (deep inset shadows + rim highlight); blocks sit neatly inside (minis 96×126 @0.646). Auto-fits any phone width via `fitBar()` scale-down.
+- **Sizes**: Hold 5 stones grew 84×110 → 96×126 (classic mode unchanged); pile is now 36 tiles (Pile 36 / Sterta 36) per request.
+- **Chips**: +N chips are 30px (minus 26px), live 1500ms with longer hold, and are CLAMPED to the viewport so they never spawn off-screen. Streak bonuses spawn as shiny animated gold-gradient text with a 🔥 icon (+40 🔥…).
+- Bar-mode scope respected: its own tuning (sizes/pile/flight) without touching classic mode or any textures.
+
+## v4.35 — Hold 5: 50-piece stacked pile + pack-right + pocket look fix (2026-08-01)
+- **Dot-block appearance in bar fixed**: v4.34 pocket override used `background:transparent !important` (shorthand) which wiped the block texture's background-image in bar minis (default/def2/def3 showed bare dots on the pocket). Now `background-color:transparent !important` — minis render identical to board tiles (verified via pixel crops).
+- **Bar packs to the right**: after a pair vanishes (or an undo), the surviving stones slide to hug the rightmost pockets with a short FLIP animation; new picks fill the leftmost free pocket.
+- **Harder pile**: 50 tiles (25 pairs), scattered in 3 layers — z1 starts after 45% placed, z2 after 68% (62% stack chance), tighter 0.52 same-layer spacing. Layout renamed Pile 50 / Sterta 50.
+- **Bigger stones**: Hold 5 tiles grew 96×126 → 108×142 (classic untouched); bar minis re-scaled 0.576 to fit the same carved pockets; vanish/ghost scales updated to match.
+- Re-verified end-to-end: auto-clear of the full 50-tile pile ends with the win overlay exactly at 0 pairs (51 moves incl. 1 shuffle).
+
+## v4.36 — Riichi Mahjong set + Hold 5 deep piles & pack-left (2026-08-01)
+- **New tile set: Mahjong 🀄** — tiles pulled from github.com/fluffystuff/riichi-mahjong-tiles (CC0 / public domain, thank you!). 34 real faces (Man/Pin/Sou 1-9, winds, dragons) composited onto the ivory tile body; works in every mode (classic layouts + Hold 5). Registered everywhere: set grids, hidden select, random pool, debug names. 144-tile layouts deal 34 types + 2 doubled ones (matching rules unchanged).
+- **Empty tile imported but never dealt** — `riichi_blank.png` (ivory front) + sheet cell 34/35 (front/back) exist in assets only.
+- **Sprite build gotcha fixed**: source PNGs are artwork-only (transparent body) → sheet = Front.png body + artwork per cell. Initial paste also stomped Haku/Pei cells — corrected.
+- **Hold 5**: stones 108×142 → 124×162 (really visible now: pile footprint shrank to 4.4×5.7 so fit-zoom stays ~0.68); pile stacks up to 4 layers (z0-z3, 68% stack roll) — harder as requested. Flying ghosts of dot-block sets keep their exact look (square corners, no clip). Bar packs LEFT now (empty pockets on the right).
+- **Anti-jam (forgivenness kept)**: full bar no longer dead-locks — a board stone may fly straight onto a parked matching pocket and pop both; bar-full overlay only shows when that rescue is impossible; bar-mode shuffle now accepts arrangements that free a bar-matching stone (pure permutation, no type cheats). Re-verified: full 50-tile 4-layer riichi pile won in 30s / 51 moves with win at exactly 0 pairs.
+
+## v4.37 — Mahjong bright & dark in set menu + start-screen mode picker (2026-08-01)
+- **Mahjong Dark set** 🀫— second flavor built from the repo's Black tiles (`tiles/riichi_dark_sheet.png`, same 34 faces on black bodies). Registered everywhere (set grids, hidden select, random pool, debug names, CC0 preserved).
+- **Bug caught**: `riichi` never made it into `SET_ORDER` in v4.36 (silent failed hunk) so the Mahjong card wasn't actually visible in the menus — fixed; BOTH sets now show in the set grid + start screen.
+- **Empty tiles imported, not dealt**: `riichi_dark_blank.png` joins `riichi_blank.png`; sheet cells 34/35 (empty/back) still excluded from the deal pool in both flavors.
+- **Start screen: 🧩 Mode picker** (Classic / Hold 5) between language and layout; choosing Hold 5 greys out + disables the layout picker and hides the best-score line (piles are self-generated). No game restart until Start is pressed; stays in sync with the Settings mode seg.
