@@ -1,0 +1,25 @@
+# --- Node / Capacitor ---
+node_modules/
+
+# --- Build artifacts ---
+capacitor-app/www/
+*.apk
+*.aab
+
+# --- Android / Gradle ---
+**/build/
+**/.gradle/
+**/local.properties
+*.keystore
+*.jks
+
+# --- OS / editors ---
+.DS_Store
+Thumbs.db
+.idea/
+*.iml
+.vscode/
+
+# --- Arena.ai workspace extras (live outside the repo, but ignore if copied in) ---
+toolchain/
+bogusia-play/

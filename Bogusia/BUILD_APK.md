@@ -1,6 +1,11 @@
-# Building the Bogusia APK locally
+# BUILD_APK.md — build the Android APK on your own machine
 
-Everything needed is in this workspace; only the toolchain (JDK + Android SDK + Node) must be installed on your machine — it can't be shipped in a workspace.
+> On the **Arena.ai sandbox**, don't use this file — run `bash bootstrap.sh`
+> (it auto-installs the toolchain). This guide is for a normal PC/Mac where you
+> install tools yourself once. Restoring to Arena from GitHub? See `RESTORE.md`.
+
+Everything needed is in this repo; only the toolchain (JDK + Android SDK + Node)
+must be installed on your machine — it can't be shipped in a repo.
 
 ## What you need installed once
 
@@ -13,22 +18,27 @@ Everything needed is in this workspace; only the toolchain (JDK + Android SDK + 
 ## One-command build (Linux/macOS/Git-Bash)
 
 ```bash
+git clone https://github.com/chwaraf/Bogusia.git
+cd Bogusia
 export JAVA_HOME=/path/to/jdk17
 export ANDROID_HOME=/path/to/android-sdk
 bash build-apk.sh
 ```
 
-Result: `Bogusia/pile-match-project/android/app/build/outputs/apk/debug/app-debug.apk`
+Result: `capacitor-app/android/app/build/outputs/apk/debug/app-debug.apk`
 
-The script: syncs `bogusia-web/` → `pile-match-project/www/` (so the current game version is packed), runs `npm install` (first time), `npx cap sync android`, then `gradlew assembleDebug`.
+The script: syncs `bogusia-web/` → `capacitor-app/www/` (so the current game
+version is packed), runs `npm install` (first time), `npx cap sync android`,
+then `gradlew assembleDebug`.
 
 ## Windows (without Git-Bash)
 
 ```bat
-cd Bogusia\pile-match-project
-copy /Y ..\..\bogusia-web\index.html www\
-copy /Y ..\..\bogusia-web\manifest.json www\
-copy /Y ..\..\bogusia-web\tiles\*.png www\tiles\
+cd Bogusia\capacitor-app
+copy /Y ..\bogusia-web\index.html www\
+copy /Y ..\bogusia-web\manifest.json www\
+copy /Y ..\bogusia-web\tiles\*.png www\tiles\
+copy /Y ..\bogusia-web\sounds\*.mp3 www\sounds\
 npm install
 npx cap sync android
 echo sdk.dir=%LOCALAPPDATA%\Android\Sdk > android\local.properties
@@ -36,12 +46,23 @@ cd android
 gradlew.bat assembleDebug
 ```
 
+## Low-RAM machines
+
+`capacitor-app/android/gradle.properties` is already tuned for small machines
+(~2 GB RAM): `org.gradle.jvmargs=-Xmx768m`, `org.gradle.daemon=false`,
+`org.gradle.workers.max=1`. These are deliberate — don't "upgrade" them, or the
+Gradle daemon gets OOM-killed mid-build.
+
 ## Signing
 
-Debug builds are signed with the standard debug key (installs over previous debug builds).
-For a Play Store release you need a **release keystore** + `assembleRelease`/bundle — say the word and I'll wire `build.gradle` signing config for it.
+Debug builds are signed with the standard debug key (installs over previous
+debug builds). For a Play Store release you need a **release keystore** +
+`assembleRelease`/bundle — the signing config is not wired yet; add it to
+`android/app/build.gradle` when needed. To share the game without the Play
+Store, attach the APK to a **GitHub Release** instead.
 
 ## Game source of truth
 
-`bogusia-web/index.html` (+ `bogusia-web/tiles/`) is the master version.
-`pile-match-project/www/` is the copy that goes into the APK — the script keeps it in sync.
+`bogusia-web/` is the master version (single-file game + tile PNGs + sound MP3s).
+`capacitor-app/www/` is the copy that goes into the APK — the script keeps it in
+sync; never edit `www/` directly.

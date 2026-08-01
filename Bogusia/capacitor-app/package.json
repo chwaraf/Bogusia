@@ -1,0 +1,11 @@
+{
+  "name": "pile-match-bogusia",
+  "version": "4.46.0",
+  "description": "Pile Match (Bogusia) - senior-friendly mahjong pair-matching game. Single-file web game in bogusia-web/ wrapped as an Android app via Capacitor 6.",
+  "dependencies": {
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/cli": "^6.1.2",
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/haptics": "^6.0.1"
+  }
+}

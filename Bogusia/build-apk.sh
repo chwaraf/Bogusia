@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-# Builds Bogusia APK locally from pile-match-project (Capacitor + Android SDK).
+# Builds the Bogusia APK from capacitor-app/ (Capacitor 6 + Android SDK).
+# Syncs bogusia-web/ -> capacitor-app/www/ first, so the current game is packed.
 # Usage: bash build-apk.sh            (first run needs internet for npm/gradle deps)
 set -euo pipefail
 
-PROJECT="$(cd "$(dirname "$0")" && pwd)/Bogusia/pile-match-project"
+PROJECT="$(cd "$(dirname "$0")" && pwd)/capacitor-app"
 WEB="$(cd "$(dirname "$0")" && pwd)/bogusia-web"
 
 # --- toolchain env (adjust if your SDK/JDK live elsewhere) ---
