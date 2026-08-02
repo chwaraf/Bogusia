@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Pile Match v4.47 - per-mode results, Hold-5 win voices + fanfare &amp; confetti, undo penalty - Bogusia</title>
+<title>Pile Match v4.51 - Mahjong HD tile set, structure star difficulty + weighted scoring - Bogusia</title>
 <meta name="theme-color" content="#1a321c">
 <link rel="manifest" href="manifest.json">
 <style>
@@ -18,7 +18,8 @@
   .lang-switch{display:flex;gap:2px;background:#0e1b0f;border-radius:7px;padding:2px;border:1px solid #2a4f2e}
   .lang-btn{background:transparent;box-shadow:none;padding:4px 9px;font-size:12.5px;border-radius:5px;min-width:30px;border:0;color:#e8f5e9;cursor:pointer}
   .lang-btn.active{background:#2e6b32}
-  #board-wrap{flex:1;position:relative;overflow:hidden;background:radial-gradient(ellipse at 30% 20%, #2f4a30 0%, transparent 55%), radial-gradient(ellipse at 70% 80%, #1a321c 0%, #0a180a 70%), #0e1b0f;touch-action:none;display:block}
+  #board-wrap{flex:1;position:relative;overflow:hidden;isolation:isolate;background:radial-gradient(ellipse at 30% 20%, #2f4a30 0%, transparent 55%), radial-gradient(ellipse at 70% 80%, #1a321c 0%, #0a180a 70%), #0e1b0f;touch-action:none;display:block}
+  body.mode-bar5 #board-wrap::before{content:'';position:absolute;inset:-26px;background:url('bg-ambient.jpg') center/cover no-repeat;filter:blur(7px) brightness(0.62) saturate(0.95);z-index:0;pointer-events:none} /* v4.49 */
   #board{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
   .tile{position:absolute;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;transition:transform 0.14s, border-color 0.14s, opacity 0.20s;width:var(--tile-w);height:var(--tile-h);overflow:hidden;background:transparent;border:0;transform:translateZ(0);will-change:transform,opacity}
   .tile-face{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;text-align:center;line-height:1;pointer-events:none;z-index:1;position:relative;overflow:hidden;border-radius:10px;background:transparent}
@@ -71,6 +72,7 @@
   body.texture-mcblock .tile,
   body.texture-mine13 .tile,
   body.texture-mine14 .tile,
+  body.texture-hd36 .tile,
   body.texture-riichi .tile,
   body.texture-riichidark .tile{
     filter:none;
@@ -88,6 +90,7 @@
   body.texture-mcblock .tile .tile-face,
   body.texture-mine13 .tile .tile-face,
   body.texture-mine14 .tile .tile-face,
+  body.texture-hd36 .tile .tile-face,
   body.texture-riichi .tile .tile-face,
   body.texture-riichidark .tile .tile-face{
     overflow:visible !important; border-radius:0 !important; border:0 !important;
@@ -100,6 +103,7 @@
   body.texture-mcblock .tile.free,
   body.texture-mine13 .tile.free,
   body.texture-mine14 .tile.free,
+  body.texture-hd36 .tile.free,
   body.texture-riichi .tile.free,
   body.texture-riichidark .tile.free{
     filter:drop-shadow(5px 6px 10px rgba(0,0,0,0.38));
@@ -112,6 +116,7 @@
   body.texture-mcblock .tile.blocked,
   body.texture-mine13 .tile.blocked,
   body.texture-mine14 .tile.blocked,
+  body.texture-hd36 .tile.blocked,
   body.texture-riichi .tile.blocked,
   body.texture-riichidark .tile.blocked{
     filter:brightness(0.66) saturate(0.7);
@@ -124,6 +129,7 @@
   body.texture-mcblock .tile.selected,
   body.texture-mine13 .tile.selected,
   body.texture-mine14 .tile.selected,
+  body.texture-hd36 .tile.selected,
   body.texture-riichi .tile.selected,
   body.texture-riichidark .tile.selected{
     filter:drop-shadow(0 0 12px rgba(255,213,79,0.9)) drop-shadow(12px 18px 22px rgba(0,0,0,0.5));
@@ -136,6 +142,7 @@
   body.texture-mcblock .tile.hinted,
   body.texture-mine13 .tile.hinted,
   body.texture-mine14 .tile.hinted,
+  body.texture-hd36 .tile.hinted,
   body.texture-riichi .tile.hinted,
   body.texture-riichidark .tile.hinted{
     animation:none !important; border:0 !important; box-shadow:none !important;
@@ -390,6 +397,7 @@
     </div>
     <div class="setting-row"><span class="setting-label" id="label-mode">🧩 Mode</span><div class="seg"><button class="modebtn" data-mode="classic">Classic</button><button class="modebtn" data-mode="bar5">Hold 5</button></div></div>
     <div class="setting-row"><span class="setting-label" id="label-volume">🔊 Głośność</span><div style="display:flex;align-items:center;gap:6px"><input type="range" id="vol-slider" min="0" max="150" step="5"><span id="vol-value" style="font-size:11px;min-width:28px">60%</span></div></div>
+    <div class="setting-row"><span class="setting-label" id="label-amb">🌧 Otoczenie</span><div style="display:flex;align-items:center;gap:6px"><input type="range" id="amb-vol-slider" min="0" max="100" step="5"><span id="amb-vol-value" style="font-size:11px;min-width:28px">20%</span></div></div>
     <div class="setting-row"><span class="setting-label" id="label-music">🎵 Muzyka</span><div style="display:flex;align-items:center;gap:6px"><input type="range" id="music-vol-slider" min="0" max="100" step="5"><span id="music-vol-value" style="font-size:11px;min-width:28px">25%</span></div></div>
     <div class="setting-row" style="display:block;padding:5px 0"><div class="tgl-grid">
       <div class="tgl-cell"><span id="label-sound">🔔 Dźwięk</span><div class="toggle" id="toggle-sound"></div></div>
@@ -407,20 +415,20 @@
 
 <script>
 const I18N={
- en:{appTitle:"Pile Match",pairs:"{n} pairs",moves:"{n} moves",hint:"💡",undo:"↩",shuffle:"🔀",layout:"🗺",results:"🏆",newGame:"New",playAgain:"▶ Play Again",winTitle:"🎉 Win!",winMsg:"{score} pts — {layout}, {moves} moves, {time}",stuckTitle:"😵 Stuck!",stuckMsg:"No free pairs! Try shuffle or undo.",shuffledTitle:"",shuffledMsg:"",noHintsTitle:"No hints",noHintsMsg:"No pairs.",chooseLayoutTitle:"🎮 Layout",chooseLayoutMsg:"Pick a layout:",testerLabel:"Tester: {name}",testerInputPH:"Tester name",legal:"v4.47: results are now split per mode — separate Classic and Hold 5 lists. The Hold-5 win dialog shows your place with a congratulation voice; 1st place gets a fanfare and golden confetti. Undo now costs points (grows each use, resets your streak).",layouts:{easy:"Easy 72",medium:"Medium 112",hard:"Turtle 144",senior:"Senior 72",bricks:"Bricks 74",scatter:"Structures"},zoomHint:"10px pile • Bubbles!",btnHint:"Hint",btnUndo:"Undo",btnShuffle:"Shuffle",btnLayout:"Layout",btnResults:"Results",randomLbl:"🎲 Random set",badgesLbl:"✔/🔒 Free marks",debugLbl:"🔍 Debug info",testerLbl2:"👩 Tester",settingsTitle:"⚙ Settings",volume:"🔊 Vol",music:"🎵 Music",sound:"🔔 Sound",vib:"📳 Vib",anim:"✨ Bubbles",perf:"🎲 3D",perfFast:"Simple",perfQuality:"Real",close:"✅ Close",reset:"🔄 Reset",lang:"Lang",resultsTitle:"🏆 Results",resultsEmpty:"No results yet.",langLbl:"🌐 Language",setLbl:"🎨 Tile set",ptsShort:"pts",clear:"🗑 Clear",resultsNote:"Tap a result to replay it.",startLayoutLbl:"🗺 Layout",startBtn:"▶ Start game",startBest:"🏆 Best on this layout: {n} pts",startBestNone:"No runs on this layout yet",modeLbl:"🧩 Mode",modeClassicLbl:"Classic",modeBarLbl:"Hold 5",resTabClassic:"🧩 Classic",resTabBar:"🖐 Hold 5",congratsX:"🎉 Congratulations!",congrats10:"👏 Sincere congratulations!",congrats3:"🌟 Super congratulations!",congrats1:"🏆 Championship!",winPlaceTxt:"{score} pts • place {place} of {total}",btnNewGame:"▶ New game",btnHome:"🏠 Start screen",barFullTitle:"😟 Bar full!",barFullMsg:"No free pocket, no pair. Undo or shuffle.",settingsNote:"v4.47: per-mode results tabs; Hold-5 finish shows place (voice for top10/top3/#1), fanfare + confetti for #1; undo penalty 12-40 pts (18-40 in Hold 5), streak reset."},
- pl:{appTitle:"Dopasuj",pairs:"{n} par",moves:"{n} ruchów",hint:"💡",undo:"↩",shuffle:"🔀",layout:"🗺",results:"🏆",newGame:"Nowa",playAgain:"▶ Zagraj",winTitle:"🎉 Wygrana!",winMsg:"{score} pkt — {layout}, {moves} ruchów, {time}",stuckTitle:"😵 Brak ruchów!",stuckMsg:"Brak par! Tasuj.",shuffledTitle:"",shuffledMsg:"",noHintsTitle:"Brak",noHintsMsg:"Brak par.",chooseLayoutTitle:"🎮 Układ",chooseLayoutMsg:"Wybierz układ:",testerLabel:"Testerka: {name}",testerInputPH:"Imię testerki",legal:"v4.47: wyniki rozdzielone na tryby — osobne listy Klasyczny i Pasek 5. Wygrana w Pasku 5 pokazuje miejsce z głosowymi gratulacjami; za 1. miejsce fanfary i złote konfetti. Cofanie kosztuje punkty (rośnie z każdym użyciem, zeruje serię).",layouts:{easy:"Łatwy 72",medium:"Średni 112",hard:"Żółw 144",senior:"Senior 72",bricks:"Cegły 74",scatter:"Konstrukcje"},zoomHint:"Warstwy 10px • Bąbelki!",btnHint:"Podpowiedź",btnUndo:"Cofnij",btnShuffle:"Tasuj",btnLayout:"Układ",btnResults:"Wyniki",randomLbl:"🎲 Losowy zestaw",badgesLbl:"✔/🔒 Znaczniki",debugLbl:"🔍 Debug",testerLbl2:"👩 Testerka",settingsTitle:"⚙ Ustawienia",volume:"🔊 Głośność",music:"🎵 Muzyka",sound:"🔔 Dźwięk",vib:"📳 Wibracje",anim:"✨ Bąbelki",perf:"🎲 3D",perfFast:"Prosty",perfQuality:"Real",close:"✅ Zamknij",reset:"🔄 Resetuj",lang:"Język",resultsTitle:"🏆 Wyniki",resultsEmpty:"Brak wyników.",langLbl:"🌐 Język",setLbl:"🎨 Zestaw",ptsShort:"pkt",clear:"🗑 Wyczyść",resultsNote:"Dotknij wyniku, aby zagrać ponownie.",startLayoutLbl:"🗺 Układ",startBtn:"▶ Rozpocznij grę",startBest:"🏆 Rekord w tym układzie: {n} pkt",startBestNone:"Brak gier w tym układzie",modeLbl:"🧩 Tryb",modeClassicLbl:"Klasyczny",modeBarLbl:"Pasek 5",resTabClassic:"🧩 Klasyczny",resTabBar:"🖐 Pasek 5",congratsX:"🎉 Gratulacje!",congrats10:"👏 Szczere gratulacje!",congrats3:"🌟 Super gratulacje!",congrats1:"🏆 Mistrzostwo!",winPlaceTxt:"{score} pkt • miejsce {place} z {total}",btnNewGame:"▶ Nowa gra",btnHome:"🏠 Ekran startowy",barFullTitle:"😟 Pasek pełny!",barFullMsg:"Brak wolnej kieszeni i pary. Cofnij albo tasuj.",settingsNote:"v4.47: zakładki wyników per tryb; koniec Paska 5 pokazuje miejsce (głos za top10/top3/#1), fanfary i konfetti za #1; kara za cofanie 12-40 pkt (18-40 w Pasku 5), reset serii."}
+ en:{appTitle:"Pile Match",pairs:"{n} pairs",moves:"{n} moves",hint:"💡",undo:"↩",shuffle:"🔀",layout:"🗺",results:"🏆",newGame:"New",playAgain:"▶ Play Again",winTitle:"🎉 Win!",winMsg:"{score} pts — {layout}, {moves} moves, {time}",stuckTitle:"😵 Stuck!",stuckMsg:"No free pairs! Try shuffle or undo.",shuffledTitle:"",shuffledMsg:"",noHintsTitle:"No hints",noHintsMsg:"No pairs.",chooseLayoutTitle:"🎮 Layout",chooseLayoutMsg:"Pick a layout:",testerLabel:"Tester: {name}",testerInputPH:"Tester name",legal:"v4.51: new Mahjong HD tile set — 36 individual riichi tiles incl. red fives (now the default). Structures have a measured difficulty from a Monte-Carlo analyzer (tests/): ★ rating shown in debug mode and points scale with it — skyscraper/quad towers +25%, corner towers −20%.",layouts:{easy:"Easy 72",medium:"Medium 112",hard:"Turtle 144",senior:"Senior 72",bricks:"Bricks 74",scatter:"Structures"},zoomHint:"10px pile • Bubbles!",btnHint:"Hint",btnUndo:"Undo",btnShuffle:"Shuffle",btnLayout:"Layout",btnResults:"Results",randomLbl:"🎲 Random set",badgesLbl:"✔/🔒 Free marks",debugLbl:"🔍 Debug info",testerLbl2:"👩 Tester",settingsTitle:"⚙ Settings",volume:"🔊 Vol",music:"🎵 Music",amb:"🌧 Ambience",sound:"🔔 Sound",vib:"📳 Vib",anim:"✨ Bubbles",perf:"🎲 3D",perfFast:"Simple",perfQuality:"Real",close:"✅ Close",reset:"🔄 Reset",lang:"Lang",resultsTitle:"🏆 Results",resultsEmpty:"No results yet.",langLbl:"🌐 Language",setLbl:"🎨 Tile set",ptsShort:"pts",clear:"🗑 Clear",resultsNote:"Tap a result to replay it.",startLayoutLbl:"🗺 Layout",startBtn:"▶ Start game",startBest:"🏆 Best on this layout: {n} pts",startBestNone:"No runs on this layout yet",modeLbl:"🧩 Mode",modeClassicLbl:"Classic",modeBarLbl:"Hold 5",resTabClassic:"🧩 Classic",resTabBar:"🖐 Hold 5",congratsX:"🎉 Congratulations!",congrats10:"👏 Sincere congratulations!",congrats3:"🌟 Super congratulations!",congrats1:"🏆 Championship!",winPlaceTxt:"{score} pts • place {place} of {total}",btnNewGame:"▶ New game",btnHome:"🏠 Start screen",barFullTitle:"😟 Bar full!",barFullMsg:"No room, no pair. Shuffle also frees a pocket.",settingsNote:"v4.51: Mahjong HD set (36 tiles incl. red 5s, default); structure star difficulty from Monte-Carlo analysis (debug: ★ display); scoring weighted by difficulty (±20-25%)."},
+ pl:{appTitle:"Dopasuj",pairs:"{n} par",moves:"{n} ruchów",hint:"💡",undo:"↩",shuffle:"🔀",layout:"🗺",results:"🏆",newGame:"Nowa",playAgain:"▶ Zagraj",winTitle:"🎉 Wygrana!",winMsg:"{score} pkt — {layout}, {moves} ruchów, {time}",stuckTitle:"😵 Brak ruchów!",stuckMsg:"Brak par! Tasuj.",shuffledTitle:"",shuffledMsg:"",noHintsTitle:"Brak",noHintsMsg:"Brak par.",chooseLayoutTitle:"🎮 Układ",chooseLayoutMsg:"Wybierz układ:",testerLabel:"Testerka: {name}",testerInputPH:"Imię testerki",legal:"v4.51: nowy zestaw Mahjong HD — 36 osobnych kamieni riichi z czerwonymi piątkami (teraz domyślny). Konstrukcje mają zmierzoną trudność analizatorem Monte-Carlo (tests/): gwiazdki ★ w trybie debug, a punkty rosną z trudnością — wieżowiec i cztery wieże +25%, wieżyczki w rogach −20%.",layouts:{easy:"Łatwy 72",medium:"Średni 112",hard:"Żółw 144",senior:"Senior 72",bricks:"Cegły 74",scatter:"Konstrukcje"},zoomHint:"Warstwy 10px • Bąbelki!",btnHint:"Podpowiedź",btnUndo:"Cofnij",btnShuffle:"Tasuj",btnLayout:"Układ",btnResults:"Wyniki",randomLbl:"🎲 Losowy zestaw",badgesLbl:"✔/🔒 Znaczniki",debugLbl:"🔍 Debug",testerLbl2:"👩 Testerka",settingsTitle:"⚙ Ustawienia",volume:"🔊 Głośność",music:"🎵 Muzyka",amb:"🌧 Otoczenie",sound:"🔔 Dźwięk",vib:"📳 Wibracje",anim:"✨ Bąbelki",perf:"🎲 3D",perfFast:"Prosty",perfQuality:"Real",close:"✅ Zamknij",reset:"🔄 Resetuj",lang:"Język",resultsTitle:"🏆 Wyniki",resultsEmpty:"Brak wyników.",langLbl:"🌐 Język",setLbl:"🎨 Zestaw",ptsShort:"pkt",clear:"🗑 Wyczyść",resultsNote:"Dotknij wyniku, aby zagrać ponownie.",startLayoutLbl:"🗺 Układ",startBtn:"▶ Rozpocznij grę",startBest:"🏆 Rekord w tym układzie: {n} pkt",startBestNone:"Brak gier w tym układzie",modeLbl:"🧩 Tryb",modeClassicLbl:"Klasyczny",modeBarLbl:"Pasek 5",resTabClassic:"🧩 Klasyczny",resTabBar:"🖐 Pasek 5",congratsX:"🎉 Gratulacje!",congrats10:"👏 Szczere gratulacje!",congrats3:"🌟 Super gratulacje!",congrats1:"🏆 Mistrzostwo!",winPlaceTxt:"{score} pkt • miejsce {place} z {total}",btnNewGame:"▶ Nowa gra",btnHome:"🏠 Ekran startowy",barFullTitle:"😟 Pasek pełny!",barFullMsg:"Brak miejsca i pary. Tasuj zwolni też kieszeń.",settingsNote:"v4.51: zestaw Mahjong HD (36 kamieni, domyślny); gwiazdki trudności konstrukcji z analizy Monte-Carlo (debug); punktacja ważona trudnością (±20-25%)."}
 };
-let settings={volume:parseInt(localStorage.getItem('pm_vol')||'70'),musicVolume:parseInt(localStorage.getItem('pm_musicvol')||'25'),soundEnabled:localStorage.getItem('pm_sound')!=='0',vibEnabled:localStorage.getItem('pm_vib')!=='0',animationsEnabled:localStorage.getItem('pm_anim')!=='0',perfMode:'fast',debugIds:localStorage.getItem('pm_debug')==='1',textureSet:localStorage.getItem('pm_textureSet')||'food',randomTexture:localStorage.getItem('pm_randomTexture')==='1',badgeIcons:localStorage.getItem('pm_badges')==='1',mode:localStorage.getItem('pm_mode')||'classic'};
+let settings={volume:parseInt(localStorage.getItem('pm_vol')||'70'),musicVolume:parseInt(localStorage.getItem('pm_musicvol')||'25'),soundEnabled:localStorage.getItem('pm_sound')!=='0',vibEnabled:localStorage.getItem('pm_vib')!=='0',animationsEnabled:localStorage.getItem('pm_anim')!=='0',perfMode:'fast',debugIds:localStorage.getItem('pm_debug')==='1',textureSet:localStorage.getItem('pm_textureSet')||'hd36',randomTexture:localStorage.getItem('pm_randomTexture')==='1',badgeIcons:localStorage.getItem('pm_badges')==='1',mode:localStorage.getItem('pm_mode')||'bar5',ambVol:parseInt(localStorage.getItem('pm_ambvol')||'20')};
 let currentLang=localStorage.getItem('pilematch_lang')||(navigator.language.startsWith('pl')?'pl':'en');
 let testerName=localStorage.getItem('pilematch_tester')||(currentLang==='pl'?'Bogusia':'Guest');
 function t(k,v={}){let s=(I18N[currentLang]&&I18N[currentLang][k])||I18N.en[k]||k;Object.keys(v).forEach(x=>s=s.replaceAll(`{${x}}`,v[x]));return s;}
-function saveSettings(){localStorage.setItem('pm_vol',settings.volume);localStorage.setItem('pm_musicvol',settings.musicVolume);localStorage.setItem('pm_sound',settings.soundEnabled?'1':'0');localStorage.setItem('pm_vib',settings.vibEnabled?'1':'0');localStorage.setItem('pm_anim',settings.animationsEnabled?'1':'0');localStorage.setItem('pm_perf',settings.perfMode);localStorage.setItem('pm_debug',settings.debugIds?'1':'0');localStorage.setItem('pm_textureSet',settings.textureSet);localStorage.setItem('pm_randomTexture',settings.randomTexture?'1':'0');localStorage.setItem('pm_badges',settings.badgeIcons?'1':'0');localStorage.setItem('pm_mode',settings.mode);applyPerfMode();}
+function saveSettings(){localStorage.setItem('pm_vol',settings.volume);localStorage.setItem('pm_musicvol',settings.musicVolume);localStorage.setItem('pm_sound',settings.soundEnabled?'1':'0');localStorage.setItem('pm_vib',settings.vibEnabled?'1':'0');localStorage.setItem('pm_anim',settings.animationsEnabled?'1':'0');localStorage.setItem('pm_perf',settings.perfMode);localStorage.setItem('pm_debug',settings.debugIds?'1':'0');localStorage.setItem('pm_textureSet',settings.textureSet);localStorage.setItem('pm_randomTexture',settings.randomTexture?'1':'0');localStorage.setItem('pm_badges',settings.badgeIcons?'1':'0');localStorage.setItem('pm_mode',settings.mode);localStorage.setItem('pm_ambvol',settings.ambVol);applyPerfMode();}
 function applyPerfMode(){
   document.body.classList.remove('mode-fast','mode-quality');document.body.classList.add('mode-fast');
   // v4.45: same tile size in every mode (senior-friendly — no giant/shrinking blocks when switching modes)
   document.documentElement.style.setProperty('--tile-w','84px');
   document.documentElement.style.setProperty('--tile-h','110px');
-  document.body.classList.remove('texture-food','texture-geometric','texture-minecraft','texture-foodblock','texture-geoblock','texture-mcblock','texture-mine13','texture-mine14','texture-riichi','texture-riichidark','texture-default','texture-def2','texture-def3');
+  document.body.classList.remove('texture-hd36','texture-food','texture-geometric','texture-minecraft','texture-foodblock','texture-geoblock','texture-mcblock','texture-mine13','texture-mine14','texture-riichi','texture-riichidark','texture-default','texture-def2','texture-def3');
   document.body.classList.add('texture-'+settings.textureSet);
   document.body.classList.toggle('mode-bar5', settings.mode==='bar5');
   document.getElementById('toggle-sound').classList.toggle('on',settings.soundEnabled);
@@ -431,6 +439,7 @@ function applyPerfMode(){
   document.getElementById('vol-slider').value=settings.volume;
   document.getElementById('vol-value').textContent=settings.volume+'%';
   const mvs=document.getElementById('music-vol-slider'); if(mvs){ mvs.value=settings.musicVolume; document.getElementById('music-vol-value').textContent=settings.musicVolume+'%'; }
+  const avs=document.getElementById('amb-vol-slider'); if(avs){ avs.value=settings.ambVol; document.getElementById('amb-vol-value').textContent=settings.ambVol+'%'; }
   document.body.classList.toggle('show-badges', !!settings.badgeIcons);
   const bt=document.getElementById('toggle-badges'); if(bt) bt.classList.toggle('on',!!settings.badgeIcons);
   const sel=document.getElementById('texture-select'); if(sel) sel.value=settings.textureSet;
@@ -499,24 +508,103 @@ function fadeMusicTo(target,ms,after){
     if(i>=steps){ clearInterval(musicFadeTimer); musicFadeTimer=null; after&&after(); }
   },60);
 }
-function startMusic(){
+function startMusic(crossfade){
   if(settings.mode!=='bar5') return;
   musicWanted=true;
   if(musicTargetVol()<=0) return;
-  if(musicAudio && !musicAudio.paused) return; // already playing
+  if(!crossfade && musicAudio && !musicAudio.paused) return; // already playing
   musicTrackIdx=(musicTrackIdx+1)%MUSIC_TRACKS.length; // alternate tracks — never the same twice
   const a=new Audio(MUSIC_TRACKS[musicTrackIdx]);
   a.preload='auto'; a.volume=0; // starts silent -> fades in
+  a._xf=false;
+  // v4.48: gapless crossfade — with <1.4 s left, this track fades out while the next fades in
+  a.addEventListener('timeupdate',()=>{
+    if(a._xf || !musicWanted || musicAudio!==a) return;
+    const d=a.duration||0; if(!d) return;
+    if(d-a.currentTime<1.4){ a._xf=true; fadeMusicTo(0,1300); startMusic(true); }
+  });
   a.addEventListener('ended',()=>{ const was=musicAudio; if(musicWanted && was===a){ startMusic(); } });
   // v4.43: each track starts at a random moment (0-40 s in) so the music never feels on rails
   a.addEventListener('loadedmetadata',()=>{ try{ a.currentTime=Math.min(Math.random()*40, Math.max(0,(a.duration||41)-2)); }catch(e){} }, {once:true});
   musicAudio=a;
   const p=a.play(); if(p&&p.catch) p.catch(()=>{});
-  fadeMusicTo(musicTargetVol(),800); // v4.42: quicker ramp-up to the slider volume
+  fadeMusicTo(musicTargetVol(), crossfade?1300:2600); // v4.48: gentle ramp-up (was 800 ms — too abrupt)
+  startAmbience();
 }
 function stopMusic(){
   musicWanted=false;
-  fadeMusicTo(0,800,()=>{ const a=musicAudio; musicAudio=null; if(a){ try{ a.pause(); }catch(e){} } });
+  fadeMusicTo(0,1200,()=>{ const a=musicAudio; musicAudio=null; if(a){ try{ a.pause(); }catch(e){} } });
+  stopAmbience();
+}
+// v4.49: real recorded ambience loops (rainfall + woodland birdsong, CC BY-SA — see sounds/CREDITS.md), Hold-5 only
+const AMB_RAIN='sounds/rain-loop.ogg', AMB_BIRDS='sounds/birds-loop.mp3';
+let amb={on:false,rain:null,birds:null};
+function ambTargetVol(){ return Math.max(0,Math.min(1,(settings.ambVol||0)/100))*0.55*0.7; } // v4.49: sits at 70% of the music range
+function fadeGain(a,target,ms,after){ // tiny per-element fader for the ambience loops
+  if(a._ft){ clearInterval(a._ft); a._ft=null; }
+  const from=a.volume, steps=Math.max(1,Math.round(ms/60)); let i=0;
+  a._ft=setInterval(()=>{ i++;
+    try{ a.volume=Math.max(0,Math.min(1,from+(target-from)*Math.min(1,i/steps))); }catch(e){}
+    if(i>=steps){ clearInterval(a._ft); a._ft=null; after&&after(); }
+  },60);
+}
+function startAmbience(){
+  if(settings.mode!=='bar5' || amb.on || ambTargetVol()<=0) return;
+  try{
+    if(!amb.rain){ amb.rain=new Audio(AMB_RAIN); amb.rain.loop=true; amb.rain.preload='auto'; }
+    if(!amb.birds){ amb.birds=new Audio(AMB_BIRDS); amb.birds.loop=true; amb.birds.preload='auto'; }
+    amb.on=true;
+    [amb.rain,amb.birds].forEach(a=>{ try{ a.currentTime=Math.random()*20; }catch(e){} a.volume=0; const p=a.play(); if(p&&p.catch) p.catch(()=>{}); });
+    fadeGain(amb.rain, ambTargetVol()*0.9, 2500);   // rain leads
+    fadeGain(amb.birds, ambTargetVol()*0.55, 3500); // birds a touch behind
+  }catch(e){}
+}
+function stopAmbience(){
+  if(!amb.on) return; amb.on=false;
+  [amb.rain,amb.birds].forEach(a=>{ if(a) fadeGain(a,0,800,()=>{ try{a.pause();}catch(e){} }); });
+}
+function syncAmbVol(){
+  if(!amb.on) return;
+  if(amb.rain) fadeGain(amb.rain, ambTargetVol()*0.9, 300);
+  if(amb.birds) fadeGain(amb.birds, ambTargetVol()*0.55, 300);
+}
+// v4.48: pentatonic match ladder — each cleared pair plays the next soft wooden note, resets after a pause
+const PENTA=[523.25,587.33,659.25,783.99,880.00,1046.50,1174.66,1318.51]; // C D E G A C6 D6 E6
+function chime(){
+  if(!settings.soundEnabled || settings.volume===0) return;
+  try{
+    const ctx=getAudioCtx(); if(!ctx) return;
+    const now=Date.now();
+    if(now-(state.lastChimeAt||0)>6000) state.chimeIdx=0; // pause -> ladder starts low again
+    state.lastChimeAt=now;
+    const f=PENTA[(state.chimeIdx||0)%PENTA.length];
+    state.chimeIdx=(state.chimeIdx||0)+1;
+    const t0=ctx.currentTime+0.01;
+    const peak=Math.max(0.05,Math.min(1,settings.volume/100))*0.5;
+    [[f,1],[f*2,0.22],[f*3,0.06]].forEach(([fr,amp])=>{
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.type='sine'; o.frequency.value=fr;
+      g.gain.setValueAtTime(peak*amp,t0);
+      g.gain.exponentialRampToValueAtTime(0.0001,t0+0.4);
+      o.connect(g); g.connect(ctx.destination); o.start(t0); o.stop(t0+0.45);
+    });
+  }catch(e){}
+}
+// v4.48: small burst of golden petals drifting up when a pair vanishes
+function petalFx(x,y){
+  if(!settings.animationsEnabled) return;
+  const cols=['#ffd700','#ffec8b','#fff3a0','#ffd1dc','#ffe0b2'];
+  for(let i=0;i<7;i++){
+    const p=document.createElement('div');
+    const sz=6+Math.random()*6;
+    p.style.cssText='position:fixed;left:'+(x-sz/2)+'px;top:'+(y-sz/2)+'px;width:'+sz+'px;height:'+(sz*0.7)+'px;border-radius:70% 70% 70% 10%;background:'+cols[(Math.random()*cols.length)|0]+';pointer-events:none;z-index:30000;box-shadow:0 0 3px rgba(255,215,0,0.5)';
+    document.body.appendChild(p);
+    const dx=(Math.random()-0.5)*70, dy=-(50+Math.random()*70), rot=90+Math.random()*270;
+    p.animate([
+      {transform:'translate(0,0) rotate(0deg) scale(1)',opacity:1},
+      {transform:'translate('+dx.toFixed(0)+'px,'+dy.toFixed(0)+'px) rotate('+rot.toFixed(0)+'deg) scale(0.85)',opacity:0}
+    ],{duration:650+Math.random()*400, easing:'cubic-bezier(.2,.6,.4,1)', fill:'forwards'}).onfinish=function(){ try{p.remove();}catch(e){} };
+  }
 }
 document.addEventListener('touchstart', ()=>{ getAudioCtx(); }, {once:true});
 document.addEventListener('click', ()=>{ getAudioCtx(); }, {once:true});
@@ -557,7 +645,7 @@ function makeScatterTiles(){
   }
   return pts;
 }
-// === STRUCTURES-BEGIN v4.46 ===
+// === STRUCTURES-BEGIN v4.51 ===
 // v4.46: hold-5 builds — user-specced compositions. Rules enforced by tests: 44-80
 // tiles, even count, every raised tile physically supported, fully drainable top-down,
 // ground layer fills >=50% of the bounding box (no skinny rails), every shape >=3 wide.
@@ -586,7 +674,7 @@ function structTwinPyramidField(){ // two side pyramids + flat 1-level middle fi
   [2,3,4,5].forEach(y=>P.push({x:3,y,z:0}));                                      // middle connector column
   return _structAssert(P);
 }
-structTwinPyramidField.disp='twin pyramids + flat field';
+structTwinPyramidField.disp='twin pyramids + flat field'; structTwinPyramidField.diff=0.80; structTwinPyramidField.stars=2;
 function structCornerTowersField(){ // little towers on 4 corners + 1 in the middle, rest 1 level — 46 tiles, 4 layers
   const P=[];
   _structRect(P,0,0,7,5,0);                                                       // the flat field
@@ -594,7 +682,7 @@ function structCornerTowersField(){ // little towers on 4 corners + 1 in the mid
   P.push({x:3,y:2,z:1},{x:3,y:2,z:2},{x:3,y:2,z:3});                              // the middle tower
   return _structAssert(P);
 }
-structCornerTowersField.disp='corner towers + middle tower';
+structCornerTowersField.disp='corner towers + middle tower'; structCornerTowersField.diff=0.80; structCornerTowersField.stars=1;
 function structQuadTowersMound(){ // four zigzag towers + middle mound — 56 tiles, 6 layers
   const P=[];
   for(let z=0;z<6;z++){
@@ -605,7 +693,7 @@ function structQuadTowersMound(){ // four zigzag towers + middle mound — 56 ti
   P.push({x:1,y:2.5,z:1},{x:2,y:2.5,z:1});                                        // mound top
   return _structAssert(P);
 }
-structQuadTowersMound.disp='quad towers + middle mound';
+structQuadTowersMound.disp='quad towers + middle mound'; structQuadTowersMound.diff=1.25; structQuadTowersMound.stars=5;
 function structRidgeWide(){ // vertical ridge + side wings; low at both ends, tallest mid — 62 tiles, 5 layers
   const P=[];
   const hs=[1,2,3,4,5,4,3,2,1];
@@ -614,7 +702,7 @@ function structRidgeWide(){ // vertical ridge + side wings; low at both ends, ta
   P.push({x:0,y:4,z:1},{x:2.4,y:4,z:1});
   return _structAssert(P);
 }
-structRidgeWide.disp='wide vertical ridge';
+structRidgeWide.disp='wide vertical ridge'; structRidgeWide.diff=0.80; structRidgeWide.stars=3;
 function structSkyscraperCity(){ // 3-column high-rise, narrows every two floors — 50 tiles, 6 layers
   const P=[];
   _structRect(P,0,0,3,4,0);
@@ -625,7 +713,7 @@ function structSkyscraperCity(){ // 3-column high-rise, narrows every two floors
   _structRect(P,1,2,2,2,5);
   return _structAssert(P);
 }
-structSkyscraperCity.disp='3-column skyscraper';
+structSkyscraperCity.disp='3-column skyscraper'; structSkyscraperCity.diff=1.25; structSkyscraperCity.stars=5;
 function structCastleKeepWide(){ // portrait castle keep with 3-wide walls — 48 tiles, 4 layers
   const P=[];
   _structRect(P,0,0,3,6,0);
@@ -634,11 +722,12 @@ function structCastleKeepWide(){ // portrait castle keep with 3-wide walls — 4
   P.push({x:0.5,y:0.5,z:3},{x:2.5,y:0.5,z:3},{x:1.5,y:3,z:3});                  // merlons
   return _structAssert(P);
 }
-structCastleKeepWide.disp='castle keep (3-wide)';
+structCastleKeepWide.disp='castle keep (3-wide)'; structCastleKeepWide.diff=0.92; structCastleKeepWide.stars=4;
 const STRUCTURE_GENS=[structTwinPyramidField,structCornerTowersField,structQuadTowersMound,structRidgeWide,structSkyscraperCity,structCastleKeepWide];
 function makeStructureTiles(){
   const g=STRUCTURE_GENS[Math.floor(Math.random()*STRUCTURE_GENS.length)];
   state.structureName=g.disp||g.name;
+  state.diffWeight=g.diff||1; state.structStars=g.stars||3; // v4.51: measured structure difficulty
   return g();
 }
 // === STRUCTURES-END ===
@@ -719,7 +808,9 @@ function computeFreeCache(){
   });
   state.freeCache=cache;
 }
+const HD36=['Man1','Man2','Man3','Man4','Man5','Man6','Man7','Man8','Man9','Pin1','Pin2','Pin3','Pin4','Pin5','Pin6','Pin7','Pin8','Pin9','Sou1','Sou2','Sou3','Sou4','Sou5','Sou6','Sou7','Sou8','Sou9','Ton','Nan','Shaa','Pei','Hatsu','Chun','Man5-Dora','Pin5-Dora','Sou5-Dora']; // v4.51: mahjong HD set — 33 faces + 3 red fives (distinct matching faces)
 function getFace(id){
+  if(settings.textureSet==='hd36'){ return `<div class="tile-face"><img src="tiles/hd36/${HD36[id%36]}.png" alt="" draggable="false" style="width:100%;height:100%;display:block"></div>`; }
   const col=id % 6, row=Math.floor(id/6)%6;
   let file='mozaika_final.png';
   if(settings.textureSet==='geometric') file='geometric_sprite.png';
@@ -803,7 +894,7 @@ function genGame(k=state.layoutKey){
   if(settings.mode==='bar5') startMusic(); else stopMusic(); // v4.41: background music only in Hold-5
   state.gameId=(state.gameId||0)+1;
   if(settings.randomTexture){
-    const sets=['food','geometric','minecraft','foodblock','geoblock','mcblock','mine13','mine14','riichi','riichidark','default','def2','def3'];
+    const sets=['hd36','food','geometric','minecraft','foodblock','geoblock','mcblock','mine13','mine14','riichi','riichidark','default','def2','def3'];
     const rnd=sets[Math.floor(Math.random()*sets.length)];
     if(rnd!==settings.textureSet){
       settings.textureSet=rnd;
@@ -815,6 +906,7 @@ function genGame(k=state.layoutKey){
   }
   if(settings.mode==='bar5') k='scatter'; else if(k==='scatter') k='senior';
   state.layoutKey=k; try{ localStorage.setItem('pm_layout',k); }catch(e){}
+  state.diffWeight=1; state.structStars=0; // v4.51: flat layouts have no difficulty weight
   const layout=LAYOUTS[k];
   let pos=(k==='scatter'||!layout) ? makeStructureTiles() : [...layout.tiles]; if(pos.length%2===1) pos.pop(); // v4.43: structured builds for Hold-5
   const cnt=pos.length; const need4=Math.floor(cnt/4); const rem=cnt%4;
@@ -831,11 +923,11 @@ function genGame(k=state.layoutKey){
   const countPairsLocal=()=>{ computeFreeCache(); const free=state.tiles.filter((t,i)=> state.freeCache[i]); const m={}; free.forEach(t=>{ const k=pairKey(t.typeId); m[k]=(m[k]||0)+1; }); let pairs=0; for(let kk in m) pairs+=Math.floor(m[kk]/2); return pairs; };
   computeFreeCache(); let pairs=countPairsLocal(); let att=0;
   while(pairs===0 && att<40){ shuffleArr(pool); state.tiles.forEach((t,i)=> t.typeId=pool[i]); computeFreeCache(); pairs=countPairsLocal(); att++; }
-  state.selected=null; state.moves=0; state.history=[]; state.startTime=Date.now(); startTimer(); state.pairsLeft=cnt/2; state.score=0; state.lastMatchAt=0; state.streak=0; state.shuffles=0; state.undos=0; state.totalTiles=cnt; setScore(0,false); barReset();
+  state.selected=null; state.moves=0; state.history=[]; state.startTime=Date.now(); startTimer(); state.pairsLeft=cnt/2; state.score=0; state.lastMatchAt=0; state.streak=0; state.shuffles=0; state.undos=0; state.chimeIdx=0; state.lastChimeAt=0; state.totalTiles=cnt; setScore(0,false); barReset();
   document.getElementById('tester-input').style.display='none';
   createDOM(); computeFreeCache(); updateVisuals();
   requestAnimationFrame(()=>{ fitAndCenter(); setTimeout(fitAndCenter, 120); });
-  const dsel=document.getElementById('debug-structure'); if(dsel){ const show=settings.debugIds && settings.mode==='bar5'; dsel.style.display=show?'block':'none'; if(show) dsel.textContent='🏗 '+(state.structureName||'?')+' • '+cnt+' tiles'; }
+  const dsel=document.getElementById('debug-structure'); if(dsel){ const show=settings.debugIds && settings.mode==='bar5'; dsel.style.display=show?'block':'none'; if(show) dsel.textContent='🏗 '+(state.structureName||'?')+' • '+cnt+' tiles'+(state.structStars?' • '+'★'.repeat(state.structStars)+'☆'.repeat(5-state.structStars):''); }
 }
 function countPairs(){ const free=state.tiles.filter((t,i)=> !t.removed && state.freeCache[i]); const m={}; free.forEach(t=>{ const k=pairKey(t.typeId); m[k]=(m[k]||0)+1; }); let p=0; for(let k in m) p+=Math.floor(m[k]/2); return p; }
 function createBubblesForTile(tile){
@@ -969,7 +1061,7 @@ function computeMatchPts(){
   if(dt!==null) mult=1+Math.max(0,Math.min(2,(10-dt)/5));
   if(dt!==null && dt<=5) state.streak++; else state.streak=1;
   const streakBonus=state.streak>=4?Math.min(25,(state.streak-3)*5):0; // v4.43: fire kicks in later (was streak>=3)
-  const pts=Math.round(10*mult)+streakBonus;
+  const pts=Math.round(10*mult*(state.diffWeight||1))+streakBonus; // v4.51: harder structures pay more
   state.lastMatchAt=now;
   return {pts:pts, bonus:streakBonus};
 }
@@ -1023,8 +1115,8 @@ function flyToBar(fromRect, slotEl, typeId, done){
   let r1=fromRect, r2;
   try{ r2=slotEl.getBoundingClientRect(); }catch(e){ done&&done(); return; }
   if(!r1 || !r1.width){ done&&done(); return; }
-  // v4.38: the ghost keeps the ORIGINAL full-size face layout and is scaled uniformly —
-  // dots no longer reflow into one line, and the piece no longer rotates in flight.
+  // v4.38: the ghost keeps the ORIGINAL full-size face layout and is scaled uniformly (dots never reflow).
+  // v4.48: one gentle 360° spin during flight, on user request.
   const cs=getComputedStyle(document.documentElement);
   const natW=parseFloat(cs.getPropertyValue('--tile-w'))||124;
   const natH=parseFloat(cs.getPropertyValue('--tile-h'))||162;
@@ -1055,7 +1147,7 @@ function flyToBar(fromRect, slotEl, typeId, done){
     const bx=2*u*te*cx + te*te*dx;
     const by=2*u*te*cy + te*te*dy;
     const sc=startSc+(endSc-startSc)*te;
-    frames.push({transform:'translate('+(sx+bx).toFixed(1)+'px,'+(sy+by).toFixed(1)+'px) scale('+sc.toFixed(3)+')',opacity:(i===STEPS?0.98:1),offset:tt});
+    frames.push({transform:'translate('+(sx+bx).toFixed(1)+'px,'+(sy+by).toFixed(1)+'px) scale('+sc.toFixed(3)+') rotate('+(360*te).toFixed(1)+'deg)',opacity:(i===STEPS?0.98:1),offset:tt});
   }
   const an=gh.animate(frames,{duration:430,easing:'linear'});
   an.onfinish=()=>{ try{gh.remove();}catch(e){} done&&done(); };
@@ -1101,10 +1193,10 @@ function vanishPair(a,b){
     if(m){ m.animate([{transform:'scale(0.72)'},{transform:'scale(0.8)',offset:0.38},{transform:'scale(0.001)'}],{duration:230,easing:'ease-in',fill:'forwards'}); m.style.opacity='0'; }
   });
   let mx=innerWidth/2, my=110;
-  try{ const ra=slots[a.slot].getBoundingClientRect(), rb=slots[b.slot].getBoundingClientRect(); mx=(ra.left+ra.width/2+rb.left+rb.width/2)/2; my=ra.top-4; }catch(e){}
+  try{ const ra=slots[a.slot].getBoundingClientRect(), rb=slots[b.slot].getBoundingClientRect(); mx=(ra.left+ra.width/2+rb.left+rb.width/2)/2; my=ra.top-4; petalFx(ra.left+ra.width/2, ra.top+ra.height/2); petalFx(rb.left+rb.width/2, rb.top+rb.height/2); }catch(e){}
   spawnScoreFx('+'+r.pts,mx,my,true,r.bonus>0);
   if(r.bonus>0) sayFire();
-  beep(620+state.moves*2,0.08); vib([30,40,60]);
+  chime(); vib([30,40,60]); // v4.48: pentatonic ladder note instead of a plain beep
   const gid=state.gameId;
   setTimeout(()=>{
     if(gid!==state.gameId) return;
@@ -1146,9 +1238,9 @@ function doBarUndo(){
 }
 function syncModeSeg(){ document.querySelectorAll('.modebtn').forEach(b=> b.classList.toggle('active', b.dataset.mode===settings.mode)); }
 // --- v4.30 texture set picker (modern grid) ---
-const SET_ORDER=['food','geometric','minecraft','foodblock','geoblock','mcblock','mine13','mine14','riichi','riichidark','default','def2','def3'];
-const SET_ICONS={food:'🍔',geometric:'🔷',minecraft:'⛏️',foodblock:'🍕',geoblock:'🔶',mcblock:'🧱',mine13:'⛰️',mine14:'💠',riichi:'🀄',riichidark:'⬛',default:'🔢',def2:'⬜',def3:'🌸'};
-const SET_NAMES={food:['Food','Jedzenie'],geometric:['Geo','Geo'],minecraft:['MC','MC'],foodblock:['Food Block','Food Blok'],geoblock:['Geo Block','Geo Blok'],mcblock:['MC Block','MC Blok'],mine13:['Mine13','Mine13'],mine14:['Mine14','Mine14'],riichi:['Mahjong','Mahjong'],riichidark:['Mahjong Dark','Mahjong Ciemny'],default:['Default','Domyślny'],def2:['Default 2','Domyślny 2'],def3:['Default 3','Domyślny 3']};
+const SET_ORDER=['hd36','food','geometric','minecraft','foodblock','geoblock','mcblock','mine13','mine14','riichi','riichidark','default','def2','def3'];
+const SET_ICONS={hd36:'🀅',food:'🍔',geometric:'🔷',minecraft:'⛏️',foodblock:'🍕',geoblock:'🔶',mcblock:'🧱',mine13:'⛰️',mine14:'💠',riichi:'🀄',riichidark:'⬛',default:'🔢',def2:'⬜',def3:'🌸'};
+const SET_NAMES={hd36:['Mahjong HD','Madżong HD'],food:['Food','Jedzenie'],geometric:['Geo','Geo'],minecraft:['MC','MC'],foodblock:['Food Block','Food Blok'],geoblock:['Geo Block','Geo Blok'],mcblock:['MC Block','MC Blok'],mine13:['Mine13','Mine13'],mine14:['Mine14','Mine14'],riichi:['Mahjong','Mahjong'],riichidark:['Mahjong Dark','Mahjong Ciemny'],default:['Default','Domyślny'],def2:['Default 2','Domyślny 2'],def3:['Default 3','Domyślny 3']};
 function setGridName(k){ const n=SET_NAMES[k]; return n?(currentLang==='pl'?n[1]:n[0]):k; }
 function syncSetGrid(){ document.querySelectorAll('.set-grid .set-card').forEach(c=> c.classList.toggle('active', c.dataset.set===settings.textureSet)); }
 function buildSetGrid(){
@@ -1409,6 +1501,7 @@ function applyLang(lang){
   document.getElementById('settings-title').textContent=t('settingsTitle');
   document.getElementById('label-volume').textContent=t('volume');
   const lm=document.getElementById('label-music'); if(lm) lm.textContent=t('music');
+  const la=document.getElementById('label-amb'); if(la) la.textContent=t('amb');
   document.getElementById('label-sound').textContent=t('sound');
   document.getElementById('label-vib').textContent=t('vib');
   document.getElementById('label-anim').textContent=t('anim');
@@ -1437,7 +1530,7 @@ document.getElementById('btn-stuck-shuffle').onclick=()=>{ document.getElementBy
 document.getElementById('btn-stuck-undo').onclick=()=>{ document.getElementById('stuck-overlay').classList.remove('show'); doUndo(); scheduleNoMovesCheck(300); };
 document.getElementById('btn-stuck-close').onclick=()=>{ document.getElementById('stuck-overlay').classList.remove('show'); };
 document.getElementById('btn-barfull-undo').onclick=()=>{ document.getElementById('barfull-overlay').classList.remove('show'); doBarUndo(); };
-document.getElementById('btn-barfull-shuffle').onclick=()=>{ document.getElementById('barfull-overlay').classList.remove('show'); doShuffle(); };
+document.getElementById('btn-barfull-shuffle').onclick=()=>{ document.getElementById('barfull-overlay').classList.remove('show'); doBarUndo(); doShuffle(); }; // v4.48: frees one pocket, then reshuffles — the prompt can't loop anymore
 document.getElementById('btn-barfull-close').onclick=()=>{ document.getElementById('barfull-overlay').classList.remove('show'); };
 document.querySelectorAll('.modebtn').forEach(b=> b.onclick=()=>{ if(settings.mode!==b.dataset.mode){ settings.mode=b.dataset.mode; saveSettings(); syncModeSeg(); genGame(state.layoutKey); beep(540,0.06); } });
 document.getElementById('btn-start').onclick=()=>{ getAudioCtx(); try{ localStorage.setItem('pm_layout',startSel.layout); }catch(e){} document.getElementById('start-overlay').classList.remove('show'); beep(660,0.09); vib(30); genGame(startSel.layout); };
@@ -1448,6 +1541,7 @@ document.getElementById('btn-settings-close').onclick=()=> document.getElementBy
 document.getElementById('settings-overlay').addEventListener('click',e=>{ if(e.target.id==='settings-overlay') e.currentTarget.classList.remove('show'); });
 document.getElementById('vol-slider').addEventListener('input',e=>{ settings.volume=parseInt(e.target.value); document.getElementById('vol-value').textContent=settings.volume+'%'; saveSettings(); beep(440,0.07); });
 document.getElementById('music-vol-slider').addEventListener('input',e=>{ settings.musicVolume=parseInt(e.target.value); document.getElementById('music-vol-value').textContent=settings.musicVolume+'%'; saveSettings(); if(settings.mode!=='bar5') return; if(settings.musicVolume===0){ stopMusic(); } else if(musicAudio && !musicAudio.paused){ fadeMusicTo(musicTargetVol(),250); } else { startMusic(); } });
+document.getElementById('amb-vol-slider').addEventListener('input',e=>{ settings.ambVol=parseInt(e.target.value); document.getElementById('amb-vol-value').textContent=settings.ambVol+'%'; saveSettings(); if(settings.mode!=='bar5') return; if(settings.ambVol===0){ stopAmbience(); } else if(amb.on){ syncAmbVol(); } else { startAmbience(); } });
 document.getElementById('toggle-sound').onclick=function(){ settings.soundEnabled=!settings.soundEnabled; saveSettings(); this.classList.toggle('on',settings.soundEnabled); if(settings.soundEnabled) beep(600,0.08); };
 document.getElementById('toggle-vib').onclick=function(){ settings.vibEnabled=!settings.vibEnabled; saveSettings(); this.classList.toggle('on',settings.vibEnabled); if(settings.vibEnabled) vib(50); };
 document.getElementById('toggle-anim').onclick=function(){ settings.animationsEnabled=!settings.animationsEnabled; saveSettings(); this.classList.toggle('on',settings.animationsEnabled); };
@@ -1466,7 +1560,7 @@ document.getElementById('toggle-random-texture').onclick=function(){
 document.getElementById('set-lang-en').onclick=()=> applyLang('en');
 document.getElementById('set-lang-pl').onclick=()=> applyLang('pl');
 document.getElementById('settings-tester-input').addEventListener('input',e=>{ testerName=e.target.value.trim()||(currentLang==='pl'?'Bogusia':'Guest'); localStorage.setItem('pilematch_tester',testerName); document.getElementById('tester-badge').textContent='👩‍💻 '+t('testerLabel',{name:testerName}); });
-document.getElementById('btn-settings-reset').onclick=()=>{ settings={volume:70,musicVolume:25,soundEnabled:true,vibEnabled:true,animationsEnabled:true,perfMode:'fast',debugIds:false,textureSet:'food',randomTexture:false,badgeIcons:false,mode:'classic'}; saveSettings(); applyLang(currentLang); createDOM(); computeFreeCache(); updateVisuals(); fitAndCenter(); };
+document.getElementById('btn-settings-reset').onclick=()=>{ settings={volume:70,musicVolume:25,ambVol:20,soundEnabled:true,vibEnabled:true,animationsEnabled:true,perfMode:'fast',debugIds:false,textureSet:'hd36',randomTexture:false,badgeIcons:false,mode:'bar5'}; saveSettings(); applyLang(currentLang); createDOM(); computeFreeCache(); updateVisuals(); fitAndCenter(); };
 document.getElementById('btn-new').onclick=()=> genGame(state.layoutKey);
 document.getElementById('btn-undo').onclick=()=>{ if(settings.mode==='bar5') doBarUndo(); else doUndo(); };
 document.getElementById('btn-shuffle').onclick=doShuffle;

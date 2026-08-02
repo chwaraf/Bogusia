@@ -4,7 +4,7 @@ A senior-friendly mahjong-solitaire-style **pair-matching game** with two game m
 English/Polish localization, recorded sound effects, and background music — built as a
 **single-file HTML5 game** and shipped as an **Android APK** via Capacitor 6.
 
-**Version v4.47** · App ID `com.bogusia.pilematch` · License: [MIT](LICENSE) ·
+**Version v4.51** · App ID `com.bogusia.pilematch` · License: [MIT](LICENSE) ·
 Made with ❤️ for Bogusia
 
 ---
@@ -47,7 +47,7 @@ PNG sprite sheets in `tiles/`, audio clips are MP3s in `sounds/`.
 | Mode | `settings.mode` | Rule |
 |---|---|---|
 | **Classic** (Klasyczny) | `'classic'` | Standard mahjong-solitaire removal from the board; tap two free matching tiles. |
-| **Hold 5** (Pasek 5) | `'bar5'` | Tapped tiles fly into a **holding bar with 5 pockets**. Two identical tiles in the bar vanish automatically. **If all 5 pockets fill with non-matching tiles — game over** (strict; there is no rescue move). Undo/shuffle are your escape. |
+| **Hold 5** (Pasek 5) — **default mode** | `'bar5'` | Tapped tiles fly into a **holding bar with 5 pockets**. Two identical tiles in the bar vanish automatically. **If all 5 pockets fill with non-matching tiles — game over** (strict; there is no rescue move). Undo/shuffle are your escape. |
 
 Hold-5 differences vs Classic:
 
@@ -58,6 +58,10 @@ Hold-5 differences vs Classic:
 - **Auto-zoom is capped at 1.0** so tiles are always exactly the same size as Classic
   (84×110 px). Classic may zoom up to 1.8×.
 - Toolbar hint/undo/shuffle all work the same.
+- Tapped tiles fly to their pocket with a gentle **360° spin**.
+- **Bar-full Shuffle actually helps** — it first returns the newest bar tile (freeing a
+  pocket, one undo penalty), then reshuffles the board. Previously it could loop the
+  "bar full" prompt forever, since reshuffling the board can't empty pockets.
 
 ## Layouts & structures
 
@@ -94,10 +98,14 @@ no duplicate positions, **fully supported** (nothing floats), **fully drainable*
 
 ## Tile sets
 
-13 selectable sets (`Settings → 🎨 Tile set`) or 🎲 random-per-game:
+14 selectable sets (`Settings → 🎨 Tile set`) or 🎲 random-per-game:
 
-`food`, `geometric`, `minecraft`, `foodblock`, `geoblock`, `mcblock`, `mine13`,
-`mine14`, `riichi`, `riichidark`, `default`, `def2`, `def3`
+`hd36` (**Mahjong HD — default**), `food`, `geometric`, `minecraft`, `foodblock`,
+`geoblock`, `mcblock`, `mine13`, `mine14`, `riichi`, `riichidark`, `default`, `def2`, `def3`
+
+- **Mahjong HD** (`hd36`): 36 individual 240×320 riichi tiles in `tiles/hd36/` —
+  9 Man + 9 Pin + 9 Sou, 4 winds, 2 dragons, and **3 red fives** which are
+  *distinct matching faces* (red 5 does not match plain 5).
 
 - Most sets are **6×6 sprite sheets**; others are single PNG blocks or dot/emoji sets.
 - **Riichi sheets** (`riichi_sheet.png`, `riichi_dark_sheet.png`, 720×960 px = 6×6
@@ -116,8 +124,13 @@ All files in `sounds/` (MP3), synced into the APK by the build script.
 | `fire-en.mp3` | “Fire!” streak-bonus voice (EN) | plays on streak bonus; **8 s throttle**; **never the same clip twice in a row** (`fireClipLastIdx`); natural recorded voice, TTS only as fallback |
 | `fire-pl-1.mp3` … `fire-pl-5.mp3` | “Ogień!” variants (PL) — 3 masculine + 2 feminine | same rules; random pick from the pool of 5 |
 | `congrats-pl*.mp3`, `congrats-en*.mp3` (8) | Hold-5 win congratulations by rank: Gratulacje / top-10 / top-3 / 1st place | recorded male voices (like fire clips), play once per win, TTS fallback |
-| *(synthesized, no file)* | 1st-place **fanfare** (~2 s) + falling golden confetti | WebAudio brass arpeggio+chord; 90 gold DOM pieces; respects sound/animation toggles |
-| `mahjong_background.mp3`, `mahjong2.mp3` | Hold-5 background music | **alternating loop** (never same track twice), fade-in 800 ms / fade-out on win or leave, **random start point 0–40 s**, plays in Hold-5 only |
+| `mahjong_background.mp3`, `mahjong2.mp3` | Hold-5 background music | **alternating loop with 1.3 s crossfade** between tracks, gentle 2.6 s fade-in on start, fade-out on win/leave, **random start point 0–40 s**, Hold-5 only |
+| `rain-loop.ogg`, `birds-loop.mp3` (real recordings, CC BY-SA — see `sounds/CREDITS.md`) | 🌧 **Ambience** — gentle rainfall + woodland birdsong loops | own 🌧 slider (default 20), mixed at **70% of the music range** (rain ×0.9, birds ×0.55), slow 2.5–3.5 s fade-ins, Hold-5 only |
+| *(synthesized, no file)* | **Pentatonic match chime** | each cleared pair plays the next soft wooden note (C-D-E-G-A…), ladder resets after a 6 s pause |
+| *(synthesized, no file)* | 1st-place **fanfare** (~2 s) + falling golden confetti | also 7-petal golden drift FX on every vanishing pair (respects the bubbles toggle) |
+
+Visual: Hold-5 plays over a **soft blurred rainy-forest photo** (`bg-ambient.jpg`,
+`blur(7px) brightness(0.62)` behind the board) — visible but never hurting tile readability.
 
 - Music volume slider default **25**; slider 100% = old 0.55 loudness (`musicTargetVol() = slider × 0.55`).
 - **Hold-5 win dialog**: shows score + place (`miejsce X z Y`) with tier voice — “Gratulacje!” (any win), “Szczere gratulacje!” (top 10), “Super gratulacje!” (top 3), “Mistrzostwo!” (#1 → fanfare + confetti). Two buttons only: ▶ New game / 🏠 Start screen.
@@ -156,14 +169,15 @@ All settings live in `localStorage`:
 |---|---|---|
 | `pm_vol` | effects volume | 70 |
 | `pm_musicvol` | music volume | 25 |
+| `pm_ambvol` | ambience (rain+birds) volume | 20 |
 | `pm_sound` | sounds on/off | 1 |
 | `pm_vib` | vibration | 1 |
 | `pm_anim` | bubble animations | 1 |
 | `pm_debug` | debug overlay | 0 |
-| `pm_textureSet` | chosen tile set | `food` |
+| `pm_textureSet` | chosen tile set | `riichi` |
 | `pm_randomTexture` | random set per game | 0 |
 | `pm_badges` | ✔/🔒 free marks on tiles | 0 |
-| `pm_mode` | `classic` / `bar5` | `classic` |
+| `pm_mode` | `classic` / `bar5` | `bar5` |
 | `pm_layout` | last classic layout | — |
 | `pm_results` | saved results (split per mode via `mode` field) | [] |
 | `pilematch_lang` | `en` / `pl` UI language | from `navigator.language` |
@@ -191,6 +205,7 @@ Bogusia/                         ← this repo
 ├── bogusia-web/                 ← ★ MASTER GAME SOURCE — edit here ★
 │   ├── index.html                   (the whole game, single file)
 │   ├── manifest.json
+│   ├── bg-ambient.jpg              (blurred forest backdrop for Hold-5)
 │   ├── tiles/                       (17 PNGs: sprite sheets & blocks)
 │   └── sounds/                      (16 MP3s: 6 fire + 8 congrats voices + 2 music)
 └── capacitor-app/               ← Capacitor 6 Android wrapper
@@ -269,8 +284,28 @@ The 6 generators sit between `// === STRUCTURES-BEGIN/END ===` markers in
 #   ground coverage ≥ 50% of bounding box · width ≥ 3 columns
 ```
 
-Run this suite **after any generator change** before building the APK. A new shape =
-one generator function + `.disp` name + entry in `STRUCTURE_GENS`.
+Run `node tests/analyze-structures.mjs [deals] [seed]` **after any generator change**
+before building the APK. A new shape = one generator function + `.disp`/`.diff`/`.stars`
++ entry in `STRUCTURE_GENS`.
+
+### Monte-Carlo difficulty analyzer (v4.51)
+
+`tests/analyze-structures.mjs` does both jobs: the static asserts above **and** a
+Monte-Carlo playout — N random deals per structure per mode, played with the game's
+real rules (classic side-block vs bar5 top-only; faces dealt in 4-copy groups over 36
+types; classic = random free pair with shuffle-on-deadlock; bar5 = greedy
+complete-a-bar-pair with undo+shuffle on bar-full). It reports win rate, deadlocks /
+bar-fulls, average bar pressure, solution length and type diversity, then derives:
+
+- **★ difficulty (1–5)** per structure (quintile inside the pool) — shown in the
+  debug tag next to the structure name
+- **scoring weight** (`g.diff`, clamped 0.80–1.25) — multiplies the speed component
+  of match points
+
+Measured values (400 deals, seed 42): skyscraper ★5 (w1.25) > quad towers ★5 (w1.25)
+> castle ★4 (w0.92) > ridge ★3 (w0.80) > twin pyramids ★2 (w0.80) > corner towers ★1
+(w0.80). Note: with dealt-4-copy faces, type diversity is ~constant — difficulty is
+driven by blocking, not face variety.
 
 ## Design rules & hard-won constraints
 
@@ -288,8 +323,9 @@ These come from direct user feedback — treat them as **requirements**, not sug
    (removed v4.38); pairs that land together still vanish before the check.
 5. **Voices must sound human:** recorded MP3 clips only (TTS is just a fallback),
    never the same clip twice in a row, 8-second global throttle.
-6. **Music stays in the background:** low volume (slider 100% = old 55%), fades
-   in/out, two alternating tracks, random start 0–40 s, Hold-5 only.
+6. **Music stays in the background:** low volume (slider 100% = old 55%), gentle
+   2.6 s fade-in, 1.3 s crossfade between the two alternating tracks, random start
+   0–40 s, Hold-5 only; ambience layer has its own slider.
 7. **Fire bonus is earned:** streak ≥ 4 before bonus points and the voice trigger.
 8. **Riichi sprite sheets:** skip cells 31/34 (blank) and 35 (back) — 33 faces only.
 9. **Bar pockets** render mini tiles at `scale(0.72)`; flight animations land
@@ -300,7 +336,11 @@ These come from direct user feedback — treat them as **requirements**, not sug
 
 | Version | Highlights |
 |---|---|
-| **v4.47** | Results split per mode (Classic/Hold-5 tabs, mode-aware replay & clear); Hold-5 win dialog v2 — score + place, ranked recorded voices (top10/top3/#1), fanfare + golden confetti for #1, buttons = New game / Start screen; **undo penalty** (escalating, streak reset, balanced vs shuffle); popups de-wall-texted. |
+| **v4.51** | **Mahjong HD set** (36 individual riichi tiles incl. red fives — default set); **Monte-Carlo difficulty analyzer** (`tests/analyze-structures.mjs`) mirroring real rules; structure ★ difficulty in debug tag; scoring weighted by structure difficulty (±20–25%); analyzer also caught & the drain test now uses randomized orders + footprint coverage. |
+| **v4.50** | 🔥 Hotfix — a malformed CSS line in v4.49 killed the `#board` rule and pushed all tiles off-screen in both modes; layout restored. New workflow guard: CSS brace-balance check after every style edit. |
+| v4.49 | Real recorded ambience (rainfall + birdsong loops, CC BY-SA — `sounds/CREDITS.md`), ambience lowered to 70% of music range, blurred rainy-forest backdrop behind the Hold-5 board. |
+| **v4.48** | Relaxation pack: 🌧 rain+birds ambience slider, pentatonic match chimes, petal vanish FX, music crossfade + slower 2.6 s fade-in, 360° pocket spin; bar-full Shuffle now frees a pocket (prompt can't loop); defaults → Hold-5 + Mahjong set. |
+| v4.47 | Results split per mode (Classic/Hold-5 tabs, mode-aware replay & clear); Hold-5 win dialog v2 — score + place, ranked recorded voices (top10/top3/#1), fanfare + golden confetti for #1, buttons = New game / Start screen; **undo penalty** (escalating, streak reset, balanced vs shuffle); popups de-wall-texted. |
 | v4.46 | Hold-5 zoom locked to natural size; structure pool v2 (6 denser compositions above); debug shows arrangement name. Triple-pyramid removed. |
 | v4.45 | Unified 84×110 tiles in both modes; bar mini rescale 0.72; riichi blank cells excluded (33 faces); structures scaled to 44–80. |
 | v4.44 | Portrait-first structures (skyscraper, twin towers, ridge, keep…). |

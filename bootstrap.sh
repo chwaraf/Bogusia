@@ -130,13 +130,22 @@ for pair in "$ROOT/bogusia-play/tiles:$TILES_DIR" "$ROOT/bogusia-play/sounds:$SO
   mkdir -p "$MASTER" "$SIDE"
   for f in "$SIDE"/*; do
     [ -e "$f" ] || continue
-    [ -e "$MASTER/$(basename "$f")" ] || { cp "$f" "$MASTER/" && echo "  [FIX]     $(basename "$f") restored from bogusia-play"; }
+    [ -e "$MASTER/$(basename "$f")" ] || { cp -r "$f" "$MASTER/" && echo "  [FIX]     $(basename "$f") restored from bogusia-play"; }
   done
   for f in "$MASTER"/*; do
     [ -e "$f" ] || continue
-    [ -e "$SIDE/$(basename "$f")" ] || cp "$f" "$SIDE/"
+    [ -e "$SIDE/$(basename "$f")" ] || cp -r "$f" "$SIDE/"
   done
 done
+# bg-ambient.jpg (v4.49) — restore from the play copy or last APK if missing
+if [ ! -f "$REPO/bogusia-web/bg-ambient.jpg" ]; then
+  if [ -f "$ROOT/bogusia-play/bg-ambient.jpg" ]; then
+    cp "$ROOT/bogusia-play/bg-ambient.jpg" "$REPO/bogusia-web/" && echo "  [FIX]     bg-ambient.jpg restored from bogusia-play"
+  else
+    APK=$(ls -t "$ROOT"/Bogusia-*.apk 2>/dev/null | head -1 || true)
+    [ -n "$APK" ] && { rm -rf /tmp/apkfixb && unzip -q -o "$APK" 'assets/public/bg-ambient.jpg' -d /tmp/apkfixb 2>/dev/null && cp /tmp/apkfixb/assets/public/bg-ambient.jpg "$REPO/bogusia-web/" 2>/dev/null && rm -rf /tmp/apkfixb && echo "  [FIX]     bg-ambient.jpg restored from $(basename "$APK")"; }
+  fi
+fi
 if ls "$TILES_DIR"/*.png >/dev/null 2>&1; then
   echo "  [OK]      tiles ($(ls "$TILES_DIR"/*.png | wc -l) png)"
 else
@@ -156,16 +165,16 @@ else
   fi
 fi
 if ls "$SOUNDS_DIR"/*.mp3 >/dev/null 2>&1; then
-  echo "  [OK]      sounds ($(ls "$SOUNDS_DIR"/*.mp3 | wc -l) mp3)"
+  echo "  [OK]      sounds ($(ls "$SOUNDS_DIR"/*.mp3 "$SOUNDS_DIR"/*.ogg 2>/dev/null | wc -l) mp3/ogg)"
 else
   mkdir -p "$SOUNDS_DIR"
   if ls "$ROOT/bogusia-play/sounds"/*.mp3 >/dev/null 2>&1; then
-    cp "$ROOT/bogusia-play/sounds"/*.mp3 "$SOUNDS_DIR/"
+    for ext in mp3 ogg; do cp "$ROOT/bogusia-play/sounds/"*.$ext "$SOUNDS_DIR/" 2>/dev/null || true; done
     echo "  [FIX]     sounds restored from bogusia-play copy"
   else
     APK=$(ls -t "$ROOT"/Bogusia-*.apk 2>/dev/null | head -1 || true)
     if [ -n "$APK" ]; then
-      rm -rf /tmp/apkfixs && unzip -q -o "$APK" 'assets/public/sounds/*.mp3' -d /tmp/apkfixs && cp /tmp/apkfixs/assets/public/sounds/*.mp3 "$SOUNDS_DIR/" && rm -rf /tmp/apkfixs
+      rm -rf /tmp/apkfixs && unzip -q -o "$APK" 'assets/public/sounds/*.mp3' 'assets/public/sounds/*.ogg' -d /tmp/apkfixs && { cp /tmp/apkfixs/assets/public/sounds/*.mp3 /tmp/apkfixs/assets/public/sounds/*.ogg "$SOUNDS_DIR/" 2>/dev/null || cp /tmp/apkfixs/assets/public/sounds/*.mp3 "$SOUNDS_DIR/"; } && rm -rf /tmp/apkfixs
       echo "  [FIX]     sounds restored from $(basename "$APK")"
     else
       echo "  [warn]    sounds not recoverable (clips exist only in this workspace) — music/voice will be silent"

@@ -2,7 +2,7 @@
 
 > Paste the prompt below into an AI coding agent (e.g. Arena.ai Agent Mode) with an
 > empty workspace and it will recreate this project. It encodes the full spec plus
-> every constraint learned over versions up to v4.47 — including the mistakes to avoid.
+> every constraint learned over versions up to v4.51 — including the mistakes to avoid.
 
 ---
 
@@ -40,15 +40,17 @@ big touch targets, gentle animations, and Polish/English bilingual UI.
 Layouts: Easy 72, Medium 112, Turtle 144, Senior 72, Bricks 74, plus “Structures”.
 Auto-zoom to fit may go up to 1.8×.
 
-**Hold 5 (Pasek 5)** — the signature mode:
+**Hold 5 (Pasek 5)** — the signature mode and the **default mode** (with the Mahjong/riichi tile set as the default face set):
 
-- Tapped tiles **fly into a holding bar of 5 pockets** (smooth flight animation,
-  natural tile size ending at `scale(0.72)` in the pocket, **no rotation**; dot-style
-  faces must not re-flow mid-flight — render the ghost at natural tile size).
+- Tapped tiles **fly into a holding bar of 5 pockets** (smooth arc flight, natural
+  tile size ending at `scale(0.72)` in the pocket, with **one gentle 360° spin**;
+  dot-style faces must not re-flow mid-flight — render the ghost at natural tile size).
 - Two identical tiles in the bar vanish automatically (scale-out 0.72→0.8→0).
 - **STRICT RULE: all 5 pockets full with no pair = game over.** No rescue by a
   matching board tile — that escape hatch existed once and was deliberately removed.
-  Bar-full dialog is one short sentence + undo/shuffle buttons.
+  Bar-full dialog is one short sentence + undo/shuffle buttons — and Shuffle there
+  must ALSO free a pocket (return the newest bar tile first), otherwise the prompt
+  loops forever since reshuffling the board can't empty pockets.
 - **Win finish (Hold-5):** dialog shows score + place achieved ("place X of Y"),
   exactly two buttons (▶ New game / 🏠 Start screen) — never a wall of text, and
   keep ALL popups terse everywhere (changes are announced in settings notes, not
@@ -76,9 +78,21 @@ generator — run it before every build):
 - **ground level fills ≥ 50% of the structure’s bounding box** — never skinny
   2-column rails, never sparse scatterings
 - **at least 3 columns wide**
-- each generator has a `.disp` display name; with debug mode on, show
-  “🏗 name • N tiles” top-left during Hold-5
+- each generator has a `.disp` display name plus measured `.diff` (0.80–1.25
+  scoring weight) and `.stars` (1–5); with debug mode on, show
+  “🏗 name • N tiles • ★★★☆☆” top-left during Hold-5
+- hard structures pay more: match points' speed component is multiplied by the
+  structure's difficulty weight (measure it with the Monte-Carlo harness, never guess)
 - no negative x coordinates (rendering starts at x=0)
+
+Tooling: `tests/analyze-structures.mjs` (Node) extracts the generators between the
+markers and runs the asserts **plus** a Monte-Carlo analyzer — N random deals per
+structure per mode with the real rules (classic side-block / bar5 top-only, faces
+dealt as 4-copy groups over 36 types), reporting win rate, deadlocks, bar-fulls, bar
+pressure, solution length and type diversity, and emitting per-structure ★ rating +
+scoring weight. Drainability must be tested with randomized orders (fixed orders
+strand vertical stacks even under the top-only rule); ground coverage is measured on
+the ground layer's own footprint.
 
 Initial pool (all must satisfy the rules above):
 twin side pyramids + flat 1-level middle field (46 tiles, 3 layers) · little towers
@@ -105,10 +119,20 @@ since undo is the only rescue from a full bar).
   (1 EN clip, 5 PL clips mixing masculine/feminine). Rules: random pick that
   **never repeats the previous clip**, **8-second global throttle**, human TTS only
   as fallback if files are missing.
-- **Background music (Hold-5 only)**: 2 tracks in an **alternating** loop (never the
-  same track twice in a row), fade-in ~800 ms on start, fade-out on win/exit, and
-  **each playback starts at a random point 0–40 s** in. Music volume slider default
-  25 where **slider 100% = 0.55 actual loudness** — music stays in the background.
+- **Background music (Hold-5 only)**: 2 tracks alternating with a ~1.3 s **crossfade**
+  between them, gentle ~2.6 s fade-in on start, fade-out on win/exit, and **each
+  playback starts at a random point 0–40 s** in. Music volume slider default 25
+  where **slider 100% = 0.55 actual loudness** — music stays in the background.
+- **Ambience (Hold-5 only)**: real recorded loops — **rainfall + woodland birdsong**
+  (CC BY-SA files with a CREDITS.md attribution; looped, soft per-element fades)
+  behind its own 🌧 slider (default 20), mixed at **70% of the music range**
+  (rain ×0.9, birds ×0.55 of that target).
+- **Hold-5 backdrop**: a soft **blurred rainy-forest photo** behind the board
+  (CSS pseudo-element, ~7px blur, darkened so tiles stay readable; Classic keeps
+  the plain felt gradient).
+- **Match sound = pentatonic ladder**: each cleared pair plays the next soft note
+  (sine with two faint partials, ~0.4 s) ascending C-D-E-G-A…; the ladder resets
+  after ~6 s of silence. Replacing pairs burst into ~7 golden petals drifting up.
 - UI click/match sounds behind a master volume slider (default 70) and a sound
   toggle; vibration via Capacitor Haptics with `navigator.vibrate` fallback.
 
@@ -125,6 +149,11 @@ settings reset restores all defaults (incl. music 25).
 Full `I18N = { en: {...}, pl: {...} }` covering every user-visible string; auto-detect
 Polish via `navigator.language`, manual switch in header. Version info string and
 settings “what’s new” note exist in both languages and are bumped every release.
+
+**Tile sets**: 14 face sets incl. **Mahjong HD** — 36 individual riichi tiles
+(240×320 PNGs with transparency; Man/Pin/Sou 1–9, 4 winds, 2 dragons, 3 red fives
+that are *distinct* matching faces) — it is the default set. Classic sprite-sheet
+sets (riichi light/dark: skip cells 31/34/35) stay available.
 
 ### Visual design
 
