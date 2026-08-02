@@ -4,7 +4,7 @@ A senior-friendly mahjong-solitaire-style **pair-matching game** with two game m
 English/Polish localization, recorded sound effects, and background music — built as a
 **single-file HTML5 game** and shipped as an **Android APK** via Capacitor 6.
 
-**Version v4.46** · App ID `com.bogusia.pilematch` · License: [MIT](LICENSE) ·
+**Version v4.47** · App ID `com.bogusia.pilematch` · License: [MIT](LICENSE) ·
 Made with ❤️ for Bogusia
 
 ---
@@ -115,9 +115,12 @@ All files in `sounds/` (MP3), synced into the APK by the build script.
 |---|---|---|
 | `fire-en.mp3` | “Fire!” streak-bonus voice (EN) | plays on streak bonus; **8 s throttle**; **never the same clip twice in a row** (`fireClipLastIdx`); natural recorded voice, TTS only as fallback |
 | `fire-pl-1.mp3` … `fire-pl-5.mp3` | “Ogień!” variants (PL) — 3 masculine + 2 feminine | same rules; random pick from the pool of 5 |
+| `congrats-pl*.mp3`, `congrats-en*.mp3` (8) | Hold-5 win congratulations by rank: Gratulacje / top-10 / top-3 / 1st place | recorded male voices (like fire clips), play once per win, TTS fallback |
+| *(synthesized, no file)* | 1st-place **fanfare** (~2 s) + falling golden confetti | WebAudio brass arpeggio+chord; 90 gold DOM pieces; respects sound/animation toggles |
 | `mahjong_background.mp3`, `mahjong2.mp3` | Hold-5 background music | **alternating loop** (never same track twice), fade-in 800 ms / fade-out on win or leave, **random start point 0–40 s**, plays in Hold-5 only |
 
 - Music volume slider default **25**; slider 100% = old 0.55 loudness (`musicTargetVol() = slider × 0.55`).
+- **Hold-5 win dialog**: shows score + place (`miejsce X z Y`) with tier voice — “Gratulacje!” (any win), “Szczere gratulacje!” (top 10), “Super gratulacje!” (top 3), “Mistrzostwo!” (#1 → fanfare + confetti). Two buttons only: ▶ New game / 🏠 Start screen.
 - Fire bonus is awarded **less often** than classic streaking: streak threshold is **≥ 4** (`streakBonus = streak≥4 ? min(25, (streak−3)×5) : 0`).
 - UI sounds respect the master volume + sound toggle; vibration uses Capacitor Haptics with `navigator.vibrate` fallback (`vib()`).
 
@@ -132,8 +135,18 @@ bonus = streak ≥ 4 ? min(25, (streak−3)×5) : 0
 points = round(10 × mult) + bonus
 ```
 
-Results are saved locally (`pm_results`), sorted by score; tapping a result replays
-that layout.
+Penalties (both reset your streak and spawn a red “−N” bubble):
+
+| Action | Cost (escalating per use) | Cap |
+|---|---|---|
+| 🔀 Shuffle | `10 + 8×uses + ⌈pairsLeft/3⌉` | 60 |
+| ↩ Undo — Classic | `12 + 6×uses` (12, 18, 24…) | 34 |
+| ↩ Undo — Hold 5 | `18 + 6×uses` (18, 24, 30…) — undo is the only bar rescue there | 40 |
+
+Results are saved locally (`pm_results`) and **split per mode** — the Results dialog has
+🧩 Classic / 🖐 Hold 5 tabs (records carry `mode`; pre-v4.47 records count as Classic).
+Sorted by score; tapping a result replays that layout in its own mode (auto-switches mode
+if needed). 🗑 Clear wipes only the visible tab's list.
 
 ## Settings & persistence
 
@@ -152,7 +165,7 @@ All settings live in `localStorage`:
 | `pm_badges` | ✔/🔒 free marks on tiles | 0 |
 | `pm_mode` | `classic` / `bar5` | `classic` |
 | `pm_layout` | last classic layout | — |
-| `pm_results` | saved results | [] |
+| `pm_results` | saved results (split per mode via `mode` field) | [] |
 | `pilematch_lang` | `en` / `pl` UI language | from `navigator.language` |
 | `pilematch_tester` | tester name | `Guest` / `Bogusia` |
 
@@ -179,7 +192,7 @@ Bogusia/                         ← this repo
 │   ├── index.html                   (the whole game, single file)
 │   ├── manifest.json
 │   ├── tiles/                       (17 PNGs: sprite sheets & blocks)
-│   └── sounds/                      (8 MP3s: 6 fire voices + 2 music tracks)
+│   └── sounds/                      (16 MP3s: 6 fire + 8 congrats voices + 2 music)
 └── capacitor-app/               ← Capacitor 6 Android wrapper
     ├── capacitor.config.json        appId com.bogusia.pilematch, webDir www
     ├── package.json                 @capacitor/* 6.1.2 + haptics
@@ -287,7 +300,8 @@ These come from direct user feedback — treat them as **requirements**, not sug
 
 | Version | Highlights |
 |---|---|
-| **v4.46** | Hold-5 zoom locked to natural size; structure pool v2 (6 denser compositions above); debug shows arrangement name. Triple-pyramid removed. |
+| **v4.47** | Results split per mode (Classic/Hold-5 tabs, mode-aware replay & clear); Hold-5 win dialog v2 — score + place, ranked recorded voices (top10/top3/#1), fanfare + golden confetti for #1, buttons = New game / Start screen; **undo penalty** (escalating, streak reset, balanced vs shuffle); popups de-wall-texted. |
+| v4.46 | Hold-5 zoom locked to natural size; structure pool v2 (6 denser compositions above); debug shows arrangement name. Triple-pyramid removed. |
 | v4.45 | Unified 84×110 tiles in both modes; bar mini rescale 0.72; riichi blank cells excluded (33 faces); structures scaled to 44–80. |
 | v4.44 | Portrait-first structures (skyscraper, twin towers, ridge, keep…). |
 | v4.43 | **Structures feature**: 5 generators + support-prune + Node test harness; `scatter` renamed “Structures/Konstrukcje”; fire threshold streak ≥ 4; random music start 0–40 s. |

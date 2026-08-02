@@ -2,7 +2,7 @@
 
 > Paste the prompt below into an AI coding agent (e.g. Arena.ai Agent Mode) with an
 > empty workspace and it will recreate this project. It encodes the full spec plus
-> every constraint learned over versions up to v4.46 — including the mistakes to avoid.
+> every constraint learned over versions up to v4.47 — including the mistakes to avoid.
 
 ---
 
@@ -29,8 +29,10 @@ big touch targets, gentle animations, and Polish/English bilingual UI.
   dot sets (default), and two “riichi” mahjong sheets (light + dark). **Riichi sheets:
   cells 31 and 34 are blank, cell 35 is the tile back — filter all three out, leaving
   33 playable faces.** Optional 🎲 random-set-per-game.
-- Toolbar: 💡 Hint, ↩ Undo, 🔀 Shuffle, 🗺 Layout, 🏆 Results (saved in localStorage,
-  sorted by score, tap a result to replay that layout), tester name field.
+- Toolbar: 💡 Hint, ↩ Undo, 🔀 Shuffle, 🗺 Layout, 🏆 Results, tester name field.
+  Results live in localStorage and are **split per mode** (Classic / Hold-5 tabs,
+  records carry a `mode` field; tap a result to replay it in its own mode; clear
+  wipes only the visible list).
 
 ### Two modes (segmented control on start screen + in settings)
 
@@ -46,7 +48,14 @@ Auto-zoom to fit may go up to 1.8×.
 - Two identical tiles in the bar vanish automatically (scale-out 0.72→0.8→0).
 - **STRICT RULE: all 5 pockets full with no pair = game over.** No rescue by a
   matching board tile — that escape hatch existed once and was deliberately removed.
-  Bar-full dialog advises undo/shuffle.
+  Bar-full dialog is one short sentence + undo/shuffle buttons.
+- **Win finish (Hold-5):** dialog shows score + place achieved ("place X of Y"),
+  exactly two buttons (▶ New game / 🏠 Start screen) — never a wall of text, and
+  keep ALL popups terse everywhere (changes are announced in settings notes, not
+  in dialogs). A recorded male voice congratulates by rank: "Gratulacje!" (any
+  win) / "Szczere gratulacje!" (top 10) / "Super gratulacje!" (top 3) /
+  "Mistrzostwo!" (#1 — followed by a ~2 s fanfare, synthesized via WebAudio, with
+  short falling golden confetti). EN clip variants too; TTS only as fallback.
 - **Relaxed free rule:** a tile is blocked ONLY when covered from above
   (≈0.9 tile-height tolerance). No left/right side-block.
 - Board layout is ALWAYS a **Structure** (below); auto-zoom **capped at 1.0×** so
@@ -84,6 +93,11 @@ Per matched pair: `mult = 1 + clamp((10−Δt)/5, 0, 2)` (up to 3× speed bonus)
 streak increments when Δt ≤ 5 s; **streak bonus only from streak ≥ 4**:
 `min(25, (streak−3)×5)`; points = `round(10×mult) + bonus`. Fire voice + on-screen
 fire effect trigger with the streak bonus.
+
+Penalties (both reset the streak and show a red "−N" bubble): shuffle costs
+`min(60, 10 + 8×uses + ⌈pairsLeft/3⌉)`; **undo costs points** — `12 + 6×uses`
+capped at 34 in Classic, `18 + 6×uses` capped at 40 in Hold-5 (pricier there,
+since undo is the only rescue from a full bar).
 
 ### Audio (recorded MP3 files in `sounds/`)
 

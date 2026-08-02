@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Pile Match v4.46 - Hold-5 tile size locked to Classic, denser structure set, debug layout names - Bogusia</title>
+<title>Pile Match v4.47 - per-mode results, Hold-5 win voices + fanfare &amp; confetti, undo penalty - Bogusia</title>
 <meta name="theme-color" content="#1a321c">
 <link rel="manifest" href="manifest.json">
 <style>
@@ -171,12 +171,15 @@
   .layout-picker button:hover{transform:translateY(-1px);box-shadow:0 4px 0 #a8966f, 0 6px 16px rgba(0,0,0,0.22)}
   .layout-picker button:active{transform:translateY(3px);box-shadow:0 0 0 #a8966f}
   .layout-picker button.active{background:linear-gradient(180deg, #4caf50 0%, #2e7d32 100%);color:white;border-color:#81c784;box-shadow:0 3px 0 #1b5e20, 0 0 0 2px #a5d6a7, 0 6px 18px rgba(46,125,50,0.35)}
-  #overlay-btn, #btn-results-close, #btn-settings-close, #btn-start{background:linear-gradient(180deg, #66bb6a 0%, #2e7d32 100%);border:2px solid #a5d6a7;color:white;box-shadow:0 4px 0 #1b5e20, 0 6px 18px rgba(46,125,50,0.35), 0 0 0 1px #81c784;padding:13px 18px;border-radius:13px;font-weight:900;font-size:14px;letter-spacing:0.3px;text-shadow:0 1px 0 rgba(0,0,0,0.15)}
+  #overlay-btn, #btn-results-close, #btn-settings-close, #btn-start, #btn-wingame, #btn-winhome{background:linear-gradient(180deg, #66bb6a 0%, #2e7d32 100%);border:2px solid #a5d6a7;color:white;box-shadow:0 4px 0 #1b5e20, 0 6px 18px rgba(46,125,50,0.35), 0 0 0 1px #81c784;padding:13px 18px;border-radius:13px;font-weight:900;font-size:14px;letter-spacing:0.3px;text-shadow:0 1px 0 rgba(0,0,0,0.15)}
   #overlay-btn:active, #btn-results-close:active, #btn-settings-close:active, #btn-start:active{transform:translateY(4px);box-shadow:0 0 0 transparent !important}
   #btn-results-clear, #btn-settings-reset{background:linear-gradient(180deg, #fffef7 0%, #f5e6c8 100%);border:2px solid #c9b896;color:#5d4037;box-shadow:0 3px 0 #a8966f, 0 5px 12px rgba(0,0,0,0.14);padding:13px 16px;border-radius:13px;font-weight:800;font-size:13px}
   .small-note{font-size:10px;opacity:0.7;line-height:1.4;margin-top:8px;background:linear-gradient(180deg, rgba(0,0,0,0.04), rgba(0,0,0,0.02));padding:8px 10px;border-radius:10px;border:1px solid rgba(0,0,0,0.06)}
   #tester-input{width:100%;padding:10px 14px;border-radius:12px;border:2px solid #c9b896;margin:10px 0;font-size:13px;text-align:center;background:#fffef7;font-weight:700;box-shadow:inset 0 2px 4px rgba(0,0,0,0.06)}
   #tester-input:focus{outline:none;border-color:#2e7d32;box-shadow:0 0 0 4px rgba(46,125,50,0.18), inset 0 2px 4px rgba(0,0,0,0.06)}
+  .restab{flex:1;padding:9px 6px;border-radius:11px;border:2px solid #c9b896;background:linear-gradient(180deg,#fffef7 0%,#f5e6c8 100%);color:#5d4037;font-weight:800;font-size:12.5px;cursor:pointer;opacity:0.85}
+  .restab.active{background:linear-gradient(180deg,#66bb6a 0%,#2e7d32 100%);color:#fff;border-color:#a5d6a7;opacity:1}
+  .confetti-piece{position:fixed;top:-16px;pointer-events:none;z-index:30000;border-radius:2px;box-shadow:0 0 4px rgba(255,215,0,0.65)}
   .results-list{max-height:300px;overflow:auto;text-align:left;margin:12px 0;border:2px solid #d4b896;border-radius:14px;padding:8px;background:linear-gradient(180deg,#fffef0 0%, #ffffff 100%);box-shadow:inset 0 2px 8px rgba(0,0,0,0.06)}
   .result-item{padding:10px 10px;border-bottom:1px solid #f0e6c8;font-size:12px;display:flex;justify-content:space-between;gap:8px;border-radius:8px;transition:background 0.18s}
   .result-item:hover{background:#fff8d6;transform:translateX(2px)}
@@ -314,6 +317,7 @@
 <div id="results-overlay" class="overlay">
   <div class="card" style="text-align:left">
     <h2 id="results-title" style="text-align:center">🏆 Wyniki</h2>
+    <div style="display:flex;gap:8px;margin:2px 0 10px"><button class="restab" id="restab-classic">🧩 Klasyczny</button><button class="restab" id="restab-bar5">🖐 Pasek 5</button></div>
     <div id="results-list" class="results-list"></div>
     <div style="display:flex;gap:10px;margin-top:14px">
       <button id="btn-results-close" style="flex:1">✅ Zamknij</button>
@@ -403,8 +407,8 @@
 
 <script>
 const I18N={
- en:{appTitle:"Pile Match",pairs:"{n} pairs",moves:"{n} moves",hint:"💡",undo:"↩",shuffle:"🔀",layout:"🗺",results:"🏆",newGame:"New",playAgain:"▶ Play Again",winTitle:"🎉 Win!",winMsg:"{layout} in {moves} moves, {time} — {score} pts. Tester: {tester}",stuckTitle:"😵 Stuck!",stuckMsg:"No free pairs! Try shuffle or undo.",shuffledTitle:"",shuffledMsg:"",noHintsTitle:"No hints",noHintsMsg:"No pairs.",chooseLayoutTitle:"🎮 Layout",chooseLayoutMsg:"Senior 72 -10% smaller centered, modern deluxe popups.",testerLabel:"Tester: {name}",testerInputPH:"Tester name",legal:"v4.46: Hold-5 tiles truly never change size now — auto-zoom is capped at natural Classic size. New builds: twin side pyramids + flat middle, corner towers + middle tower on a flat board, quad towers + mound, wide ridge with side wings, 3-column skyscraper, 3-wide keep. No skinny layouts: ground always fills over half. Debug toggle shows the layout name.",layouts:{easy:"Easy 72",medium:"Medium 112",hard:"Turtle 144",senior:"Senior 72",bricks:"Bricks 74",scatter:"Structures"},zoomHint:"10px pile • Bubbles!",btnHint:"Hint",btnUndo:"Undo",btnShuffle:"Shuffle",btnLayout:"Layout",btnResults:"Results",randomLbl:"🎲 Random set",badgesLbl:"✔/🔒 Free marks",debugLbl:"🔍 Debug info",testerLbl2:"👩 Tester",settingsTitle:"⚙ Settings",volume:"🔊 Vol",music:"🎵 Music",sound:"🔔 Sound",vib:"📳 Vib",anim:"✨ Bubbles",perf:"🎲 3D",perfFast:"Simple",perfQuality:"Real",close:"✅ Close",reset:"🔄 Reset",lang:"Lang",resultsTitle:"🏆 Results",resultsEmpty:"No results yet.",langLbl:"🌐 Language",setLbl:"🎨 Tile set",ptsShort:"pts",clear:"🗑 Clear",resultsNote:"Saved locally. Sorted by score. Tap a result to replay that layout.",startLayoutLbl:"🗺 Layout",startBtn:"▶ Start game",startBest:"🏆 Best on this layout: {n} pts",startBestNone:"No runs on this layout yet",modeLbl:"🧩 Mode",modeClassicLbl:"Classic",modeBarLbl:"Hold 5",barFullTitle:"😟 Bar full!",barFullMsg:"The holding bar is full and no pair fits. Undo a pick or shuffle the board.",settingsNote:"v4.46: bar5 zoom locked to natural size (tiles identical to Classic in every game). Structure set v2: 6 denser compositions, ground fill >=50%, min width 3 columns, still 44-80 tiles and fully drainable. Debug mode prints the arrangement name top-left."},
- pl:{appTitle:"Dopasuj",pairs:"{n} par",moves:"{n} ruchów",hint:"💡",undo:"↩",shuffle:"🔀",layout:"🗺",results:"🏆",newGame:"Nowa",playAgain:"▶ Zagraj",winTitle:"🎉 Wygrana!",winMsg:"{layout} w {moves} ruchach, {time} — {score} pkt. Testerka: {tester}",stuckTitle:"😵 Brak ruchów!",stuckMsg:"Brak par! Tasuj.",shuffledTitle:"",shuffledMsg:"",noHintsTitle:"Brak",noHintsMsg:"Brak par.",chooseLayoutTitle:"🎮 Układ",chooseLayoutMsg:"Senior -10% mniejszy wyśrodkowany, nowoczesne popupy.",testerLabel:"Testerka: {name}",testerInputPH:"Imię testerki",legal:"v4.46: Kamienie w Pasku 5 już nigdy nie zmieniają rozmiaru — auto-zoom ograniczony do naturalnej wielkości z trybu klasycznego. Nowe konstrukcje: piramidy boczne + płaski środek, wieżyczki w rogach + środkowa na płaskiej planszy, cztery wieże + pagórek, szeroka grań ze skrzydłami, wieżowiec 3-kolumnowy, donżon 3-szeroki. Bez wąskich układów: podstawa wypełnia ponad połowę. Tryb debug pokazuje nazwę układu.",layouts:{easy:"Łatwy 72",medium:"Średni 112",hard:"Żółw 144",senior:"Senior 72",bricks:"Cegły 74",scatter:"Konstrukcje"},zoomHint:"Warstwy 10px • Bąbelki!",btnHint:"Podpowiedź",btnUndo:"Cofnij",btnShuffle:"Tasuj",btnLayout:"Układ",btnResults:"Wyniki",randomLbl:"🎲 Losowy zestaw",badgesLbl:"✔/🔒 Znaczniki",debugLbl:"🔍 Debug",testerLbl2:"👩 Testerka",settingsTitle:"⚙ Ustawienia",volume:"🔊 Głośność",music:"🎵 Muzyka",sound:"🔔 Dźwięk",vib:"📳 Wibracje",anim:"✨ Bąbelki",perf:"🎲 3D",perfFast:"Prosty",perfQuality:"Real",close:"✅ Zamknij",reset:"🔄 Resetuj",lang:"Język",resultsTitle:"🏆 Wyniki",resultsEmpty:"Brak wyników.",langLbl:"🌐 Język",setLbl:"🎨 Zestaw",ptsShort:"pkt",clear:"🗑 Wyczyść",resultsNote:"Zapisane lokalnie. Sortowane po punktach. Dotknij wyniku, aby zagrać ten układ ponownie.",startLayoutLbl:"🗺 Układ",startBtn:"▶ Rozpocznij grę",startBest:"🏆 Rekord w tym układzie: {n} pkt",startBestNone:"Brak gier w tym układzie",modeLbl:"🧩 Tryb",modeClassicLbl:"Klasyczny",modeBarLbl:"Pasek 5",barFullTitle:"😟 Pasek pełny!",barFullMsg:"Pasek jest pełny i nie ma pary. Cofnij wybór albo potasuj planszę.",settingsNote:"v4.46: Zoom Paska 5 zablokowany na naturalnym rozmiarze (kamienie jak w klasycznym, co grę). Zestaw konstrukcji v2: 6 gęstszych kompozycji, wypełnienie podstawy >=50%, min. 3 kolumny szerokości, nadal 44-80 kamieni i pełna rozgrywalność. Debug wypisuje nazwę układu w rogu."}
+ en:{appTitle:"Pile Match",pairs:"{n} pairs",moves:"{n} moves",hint:"💡",undo:"↩",shuffle:"🔀",layout:"🗺",results:"🏆",newGame:"New",playAgain:"▶ Play Again",winTitle:"🎉 Win!",winMsg:"{score} pts — {layout}, {moves} moves, {time}",stuckTitle:"😵 Stuck!",stuckMsg:"No free pairs! Try shuffle or undo.",shuffledTitle:"",shuffledMsg:"",noHintsTitle:"No hints",noHintsMsg:"No pairs.",chooseLayoutTitle:"🎮 Layout",chooseLayoutMsg:"Pick a layout:",testerLabel:"Tester: {name}",testerInputPH:"Tester name",legal:"v4.47: results are now split per mode — separate Classic and Hold 5 lists. The Hold-5 win dialog shows your place with a congratulation voice; 1st place gets a fanfare and golden confetti. Undo now costs points (grows each use, resets your streak).",layouts:{easy:"Easy 72",medium:"Medium 112",hard:"Turtle 144",senior:"Senior 72",bricks:"Bricks 74",scatter:"Structures"},zoomHint:"10px pile • Bubbles!",btnHint:"Hint",btnUndo:"Undo",btnShuffle:"Shuffle",btnLayout:"Layout",btnResults:"Results",randomLbl:"🎲 Random set",badgesLbl:"✔/🔒 Free marks",debugLbl:"🔍 Debug info",testerLbl2:"👩 Tester",settingsTitle:"⚙ Settings",volume:"🔊 Vol",music:"🎵 Music",sound:"🔔 Sound",vib:"📳 Vib",anim:"✨ Bubbles",perf:"🎲 3D",perfFast:"Simple",perfQuality:"Real",close:"✅ Close",reset:"🔄 Reset",lang:"Lang",resultsTitle:"🏆 Results",resultsEmpty:"No results yet.",langLbl:"🌐 Language",setLbl:"🎨 Tile set",ptsShort:"pts",clear:"🗑 Clear",resultsNote:"Tap a result to replay it.",startLayoutLbl:"🗺 Layout",startBtn:"▶ Start game",startBest:"🏆 Best on this layout: {n} pts",startBestNone:"No runs on this layout yet",modeLbl:"🧩 Mode",modeClassicLbl:"Classic",modeBarLbl:"Hold 5",resTabClassic:"🧩 Classic",resTabBar:"🖐 Hold 5",congratsX:"🎉 Congratulations!",congrats10:"👏 Sincere congratulations!",congrats3:"🌟 Super congratulations!",congrats1:"🏆 Championship!",winPlaceTxt:"{score} pts • place {place} of {total}",btnNewGame:"▶ New game",btnHome:"🏠 Start screen",barFullTitle:"😟 Bar full!",barFullMsg:"No free pocket, no pair. Undo or shuffle.",settingsNote:"v4.47: per-mode results tabs; Hold-5 finish shows place (voice for top10/top3/#1), fanfare + confetti for #1; undo penalty 12-40 pts (18-40 in Hold 5), streak reset."},
+ pl:{appTitle:"Dopasuj",pairs:"{n} par",moves:"{n} ruchów",hint:"💡",undo:"↩",shuffle:"🔀",layout:"🗺",results:"🏆",newGame:"Nowa",playAgain:"▶ Zagraj",winTitle:"🎉 Wygrana!",winMsg:"{score} pkt — {layout}, {moves} ruchów, {time}",stuckTitle:"😵 Brak ruchów!",stuckMsg:"Brak par! Tasuj.",shuffledTitle:"",shuffledMsg:"",noHintsTitle:"Brak",noHintsMsg:"Brak par.",chooseLayoutTitle:"🎮 Układ",chooseLayoutMsg:"Wybierz układ:",testerLabel:"Testerka: {name}",testerInputPH:"Imię testerki",legal:"v4.47: wyniki rozdzielone na tryby — osobne listy Klasyczny i Pasek 5. Wygrana w Pasku 5 pokazuje miejsce z głosowymi gratulacjami; za 1. miejsce fanfary i złote konfetti. Cofanie kosztuje punkty (rośnie z każdym użyciem, zeruje serię).",layouts:{easy:"Łatwy 72",medium:"Średni 112",hard:"Żółw 144",senior:"Senior 72",bricks:"Cegły 74",scatter:"Konstrukcje"},zoomHint:"Warstwy 10px • Bąbelki!",btnHint:"Podpowiedź",btnUndo:"Cofnij",btnShuffle:"Tasuj",btnLayout:"Układ",btnResults:"Wyniki",randomLbl:"🎲 Losowy zestaw",badgesLbl:"✔/🔒 Znaczniki",debugLbl:"🔍 Debug",testerLbl2:"👩 Testerka",settingsTitle:"⚙ Ustawienia",volume:"🔊 Głośność",music:"🎵 Muzyka",sound:"🔔 Dźwięk",vib:"📳 Wibracje",anim:"✨ Bąbelki",perf:"🎲 3D",perfFast:"Prosty",perfQuality:"Real",close:"✅ Zamknij",reset:"🔄 Resetuj",lang:"Język",resultsTitle:"🏆 Wyniki",resultsEmpty:"Brak wyników.",langLbl:"🌐 Język",setLbl:"🎨 Zestaw",ptsShort:"pkt",clear:"🗑 Wyczyść",resultsNote:"Dotknij wyniku, aby zagrać ponownie.",startLayoutLbl:"🗺 Układ",startBtn:"▶ Rozpocznij grę",startBest:"🏆 Rekord w tym układzie: {n} pkt",startBestNone:"Brak gier w tym układzie",modeLbl:"🧩 Tryb",modeClassicLbl:"Klasyczny",modeBarLbl:"Pasek 5",resTabClassic:"🧩 Klasyczny",resTabBar:"🖐 Pasek 5",congratsX:"🎉 Gratulacje!",congrats10:"👏 Szczere gratulacje!",congrats3:"🌟 Super gratulacje!",congrats1:"🏆 Mistrzostwo!",winPlaceTxt:"{score} pkt • miejsce {place} z {total}",btnNewGame:"▶ Nowa gra",btnHome:"🏠 Ekran startowy",barFullTitle:"😟 Pasek pełny!",barFullMsg:"Brak wolnej kieszeni i pary. Cofnij albo tasuj.",settingsNote:"v4.47: zakładki wyników per tryb; koniec Paska 5 pokazuje miejsce (głos za top10/top3/#1), fanfary i konfetti za #1; kara za cofanie 12-40 pkt (18-40 w Pasku 5), reset serii."}
 };
 let settings={volume:parseInt(localStorage.getItem('pm_vol')||'70'),musicVolume:parseInt(localStorage.getItem('pm_musicvol')||'25'),soundEnabled:localStorage.getItem('pm_sound')!=='0',vibEnabled:localStorage.getItem('pm_vib')!=='0',animationsEnabled:localStorage.getItem('pm_anim')!=='0',perfMode:'fast',debugIds:localStorage.getItem('pm_debug')==='1',textureSet:localStorage.getItem('pm_textureSet')||'food',randomTexture:localStorage.getItem('pm_randomTexture')==='1',badgeIcons:localStorage.getItem('pm_badges')==='1',mode:localStorage.getItem('pm_mode')||'classic'};
 let currentLang=localStorage.getItem('pilematch_lang')||(navigator.language.startsWith('pl')?'pl':'en');
@@ -638,7 +642,7 @@ function makeStructureTiles(){
   return g();
 }
 // === STRUCTURES-END ===
-let state={layoutKey:'senior',tiles:[],selected:null,moves:0,startTime:0,timerId:null,history:[],pairsLeft:0,freeCache:[],score:0,lastMatchAt:0,streak:0,shuffles:0,totalTiles:0,gameId:0};
+let state={layoutKey:'senior',tiles:[],selected:null,moves:0,startTime:0,timerId:null,history:[],pairsLeft:0,freeCache:[],score:0,lastMatchAt:0,streak:0,shuffles:0,undos:0,totalTiles:0,gameId:0};
 const boardEl=document.getElementById('board');
 const boardWrap=document.getElementById('board-wrap');
 const timerEl=document.getElementById('timer');
@@ -827,7 +831,7 @@ function genGame(k=state.layoutKey){
   const countPairsLocal=()=>{ computeFreeCache(); const free=state.tiles.filter((t,i)=> state.freeCache[i]); const m={}; free.forEach(t=>{ const k=pairKey(t.typeId); m[k]=(m[k]||0)+1; }); let pairs=0; for(let kk in m) pairs+=Math.floor(m[kk]/2); return pairs; };
   computeFreeCache(); let pairs=countPairsLocal(); let att=0;
   while(pairs===0 && att<40){ shuffleArr(pool); state.tiles.forEach((t,i)=> t.typeId=pool[i]); computeFreeCache(); pairs=countPairsLocal(); att++; }
-  state.selected=null; state.moves=0; state.history=[]; state.startTime=Date.now(); startTimer(); state.pairsLeft=cnt/2; state.score=0; state.lastMatchAt=0; state.streak=0; state.shuffles=0; state.totalTiles=cnt; setScore(0,false); barReset();
+  state.selected=null; state.moves=0; state.history=[]; state.startTime=Date.now(); startTimer(); state.pairsLeft=cnt/2; state.score=0; state.lastMatchAt=0; state.streak=0; state.shuffles=0; state.undos=0; state.totalTiles=cnt; setScore(0,false); barReset();
   document.getElementById('tester-input').style.display='none';
   createDOM(); computeFreeCache(); updateVisuals();
   requestAnimationFrame(()=>{ fitAndCenter(); setTimeout(fitAndCenter, 120); });
@@ -935,6 +939,17 @@ function awardMatchPoints(a,b){
   spawnScoreFx('+'+r.pts,mx,my,true,r.bonus>0);
   if(r.bonus>0) sayFire();
   return r.pts;
+}
+function applyUndoPenalty(){ // v4.47: undo now costs points — cheaper than shuffle, still escalates + breaks streak
+  state.undos=(state.undos||0)+1;
+  const base=settings.mode==='bar5'?18:12; // Hold-5: undo is the only bar-full rescue, so it costs more
+  const pen=Math.min(base+22, base+6*(state.undos-1)); // classic 12..34, hold5 18..40
+  state.streak=0; state.lastMatchAt=0;
+  setScore(state.score-pen);
+  let mx=innerWidth/2, my=innerHeight-90;
+  try{ const r=document.getElementById('btn-undo').getBoundingClientRect(); mx=r.left+r.width/2; my=r.top-4; }catch(e){}
+  spawnScoreFx('−'+pen,mx,my,false);
+  return pen;
 }
 function applyShufflePenalty(){
   state.shuffles++;
@@ -1119,6 +1134,7 @@ function doBarUndo(){
   let it=null;
   barSlots.forEach(s=>{ if(s && s.landed && !s.vanishing && (!it || s.seq>it.seq)) it=s; });
   if(!it){ beep(180,0.05); return; }
+  applyUndoPenalty(); // v4.47
   barSlots[it.slot]=null;
   const tile=state.tiles.find(tt=>tt.posIdx===it.posIdx);
   if(tile){ tile.removed=false; if(tile.el){ tile.el.style.display=''; tile.el.classList.remove('removed'); tile.el.innerHTML=getFace(tile.typeId); } }
@@ -1162,12 +1178,13 @@ function buildStartLayouts(){
 function updateStartBest(){
   const el=document.getElementById('start-best'); if(!el) return;
   let best=0;
-  try{ const arr=JSON.parse(localStorage.getItem('pm_results')||'[]'); arr.forEach(r=>{ if(r.layout===startSel.layout && (r.score||0)>best) best=r.score; }); }catch(e){}
+  try{ const arr=JSON.parse(localStorage.getItem('pm_results')||'[]'); arr.forEach(r=>{ if(r.layout===startSel.layout && (r.mode||'classic')===settings.mode && (r.score||0)>best) best=r.score; }); }catch(e){}
   el.textContent = best>0 ? t('startBest',{n:best}) : t('startBestNone');
 }
 function doUndo(){
   const last=state.history.pop();
   if(!last) return;
+  applyUndoPenalty(); // v4.47
   if(last.type==='shuffle'){
     last.tiles.forEach(s=>{ const t=state.tiles.find(tt=>tt.posIdx===s.posIdx); if(t){ t.typeId=s.typeId; if(t.el) t.el.innerHTML=getFace(t.typeId); } });
     state.moves=Math.max(0,state.moves-1);
@@ -1256,7 +1273,8 @@ function win(){
   stopMusic(); // v4.41: fade the music out when the run ends
   clearInterval(state.timerId);
   const time=timerEl.textContent;
-  const result={layout:state.layoutKey, moves:state.moves, score:state.score, time:time, tester:testerName, date:new Date().toISOString(), lang:currentLang, texture:settings.textureSet};
+  const result={layout:state.layoutKey, moves:state.moves, score:state.score, time:time, tester:testerName, date:new Date().toISOString(), lang:currentLang, texture:settings.textureSet, mode:settings.mode};
+  let place=0, total=0;
   try{
     const arr=JSON.parse(localStorage.getItem('pm_results')||'[]');
     arr.push(result);
@@ -1265,10 +1283,94 @@ function win(){
     const key=`best_${state.layoutKey}_${currentLang}`;
     const best=localStorage.getItem(key);
     if(!best || state.moves < JSON.parse(best).moves){ localStorage.setItem(key, JSON.stringify(result)); }
+    const mine=arr.filter(r=>(r.mode||'classic')===settings.mode).sort((x,y)=>((y.score||0)-(x.score||0)) || (x.moves-y.moves));
+    total=mine.length; place=mine.indexOf(result)+1; // v4.47: rank inside this mode's list
   }catch(e){}
-  overlay(t('winTitle'), t('winMsg',{layout:getLayoutName(state.layoutKey), moves:state.moves, time:time, score:state.score, tester:testerName}), true);
+  if(settings.mode==='bar5'){ winBar5(place,total); }
+  else overlay(t('winTitle'), t('winMsg',{layout:getLayoutName(state.layoutKey), moves:state.moves, time:time, score:state.score}), true);
   beep(880,0.25); vib([50,40,100,40,150]);
   for(let i=0;i<16;i++){ setTimeout(()=>{ const r=state.tiles[Math.floor(Math.random()*state.tiles.length)]; if(r) createBubblesForTile(r); }, i*70); }
+}
+// === v4.47 Hold-5 finish: ranked recorded voices, fanfare + golden confetti for #1 ===
+const CONGRATS_CLIPS={en:{X:'congrats-en.mp3',10:'congrats-en-10.mp3',3:'congrats-en-3.mp3',1:'congrats-en-1.mp3'},
+                      pl:{X:'congrats-pl.mp3',10:'congrats-pl-10.mp3',3:'congrats-pl-3.mp3',1:'congrats-pl-1.mp3'}};
+function winBar5(place,total){
+  const tier=place===1?1:(place>0&&place<=3?3:(place>0&&place<=10?10:0));
+  const key=tier===1?'congrats1':(tier===3?'congrats3':(tier===10?'congrats10':'congratsX'));
+  overlay(t(key), t('winPlaceTxt',{score:state.score, place:place||'—', total:total||'—'}), false);
+  const p=document.getElementById('layout-picker'); p.innerHTML='';
+  const bNew=document.createElement('button'); bNew.id='btn-wingame'; bNew.textContent=t('btnNewGame'); bNew.style.cssText='flex:1;min-width:130px';
+  bNew.onclick=()=>{ hideO(); genGame('scatter'); };
+  const bHome=document.createElement('button'); bHome.id='btn-winhome'; bHome.textContent=t('btnHome'); bHome.style.cssText='flex:1;min-width:130px';
+  bHome.onclick=()=>{ hideO(); buildStartLayouts(); updateStartBest(); syncStartMode(); document.getElementById('start-overlay').classList.add('show'); };
+  p.appendChild(bNew); p.appendChild(bHome);
+  sayCongrats(tier,key);
+  if(place===1){ setTimeout(playFanfare,1300); goldConfetti(3000); }
+}
+function sayCongrats(tier,key){
+  if(!settings.soundEnabled || settings.volume===0) return;
+  const lang=(currentLang==='pl')?'pl':'en';
+  const tk=tier===1?'1':(tier===3?'3':(tier===10?'10':'X'));
+  const path='sounds/'+(CONGRATS_CLIPS[lang]||CONGRATS_CLIPS.en)[tk];
+  try{
+    let a=fireAudioCache[path];
+    if(!a){ a=new Audio(path); a.preload='auto'; fireAudioCache[path]=a; }
+    a.volume=Math.max(0.05,Math.min(1,settings.volume/100));
+    try{ a.currentTime=0; }catch(e){}
+    const pr=a.play();
+    if(pr && pr.catch) pr.catch(()=>sayCongratsTTS(key));
+  }catch(e){ sayCongratsTTS(key); }
+}
+function sayCongratsTTS(key){ // last-resort fallback if clips are missing
+  try{
+    const synth=window.speechSynthesis; if(!synth || typeof SpeechSynthesisUtterance==='undefined') return;
+    const u=new SpeechSynthesisUtterance(t(key).replace(/^\S+\s/,'')); // strip leading emoji
+    u.lang=(currentLang==='pl'?'pl-PL':'en-US');
+    u.pitch=0.85; u.rate=0.95; u.volume=Math.max(0.05,Math.min(1,settings.volume/100));
+    synth.cancel(); synth.speak(u);
+  }catch(e){}
+}
+function playFanfare(){ // ~2 s synthesized brass fanfare (no external file needed)
+  if(!settings.soundEnabled || settings.volume===0) return;
+  try{
+    const ctx=getAudioCtx(); if(!ctx) return;
+    const t0=ctx.currentTime+0.05;
+    const peak=Math.max(0.05,Math.min(1,settings.volume/100))*0.24;
+    const seq=[
+      {f:523.25,t:0.00,d:0.15},{f:659.25,t:0.15,d:0.15},{f:783.99,t:0.30,d:0.15},{f:1046.50,t:0.45,d:0.32},
+      {f:1046.50,t:0.90,d:1.05},{f:1318.51,t:0.90,d:1.05},{f:1567.98,t:0.90,d:1.05}
+    ];
+    seq.forEach(n=>[0,4].forEach(det=>{
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.type='triangle'; o.frequency.value=n.f; o.detune.value=det;
+      g.gain.setValueAtTime(0.0001,t0+n.t);
+      g.gain.exponentialRampToValueAtTime(peak,t0+n.t+0.03);
+      g.gain.exponentialRampToValueAtTime(0.0001,t0+n.t+n.d);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(t0+n.t); o.stop(t0+n.t+n.d+0.05);
+    }));
+  }catch(e){}
+}
+function goldConfetti(dur=3000){ // short falling golden confetti
+  if(!settings.animationsEnabled) return;
+  const colors=['#ffd700','#ffec8b','#daa520','#fff3a0','#ffc125','#f0e68c'];
+  const pieces=[];
+  for(let i=0;i<90;i++){
+    const c=document.createElement('div'); c.className='confetti-piece';
+    const sz=5+Math.random()*7;
+    c.style.width=sz+'px'; c.style.height=(sz*0.62)+'px';
+    c.style.left=(Math.random()*100)+'vw';
+    c.style.background=colors[(Math.random()*colors.length)|0];
+    document.body.appendChild(c); pieces.push(c);
+    const fall=(innerHeight+40)*(0.9+Math.random()*0.25);
+    const sway=(Math.random()-0.5)*140;
+    c.animate([
+      {transform:'translate3d(0,0,0) rotate(0deg)',opacity:1},
+      {transform:`translate3d(${sway}px,${fall*0.55}px,0) rotate(${180+Math.random()*180}deg)`,opacity:1,offset:0.55},
+      {transform:`translate3d(${sway*0.4}px,${fall}px,0) rotate(${360+Math.random()*260}deg)`,opacity:0.9}
+    ],{duration:1500+Math.random()*1100, delay:Math.random()*600, easing:'linear', fill:'forwards'});
+  }
+  setTimeout(()=>pieces.forEach(pc=>pc.remove()), dur);
 }
 function overlay(tt,msg,show){ document.getElementById('overlay-title').textContent=tt; document.getElementById('overlay-msg').textContent=msg; const p=document.getElementById('layout-picker'); p.innerHTML=''; if(show || document.getElementById('overlay').dataset.force==='1'){ Object.keys(LAYOUTS).forEach(k=>{ const b=document.createElement('button'); b.textContent=getLayoutName(k); b.onclick=()=>{ hideO(); genGame(k); }; p.appendChild(b); }); } document.getElementById('overlay').classList.add('show'); }
 function hideO(){ document.getElementById('overlay').classList.remove('show'); document.getElementById('overlay').dataset.force='0'; document.getElementById('tester-input').style.display='none'; }
@@ -1373,11 +1475,16 @@ document.getElementById('btn-layout').onclick=()=>{ document.getElementById('ove
 document.getElementById('overlay-btn').onclick=()=>{ const v=document.getElementById('tester-input').value.trim(); if(v){ testerName=v; localStorage.setItem('pilematch_tester',testerName); document.getElementById('tester-badge').textContent='👩‍💻 '+t('testerLabel',{name:testerName}); } hideO(); if(state.pairsLeft===0) genGame(state.layoutKey); };
 
 // Results
+let resultsTab=null; // v4.47: results are split per mode; null = follow current game mode
 function showResults(){
   const overlay=document.getElementById('results-overlay');
   const list=document.getElementById('results-list');
+  if(!resultsTab) resultsTab=settings.mode;
+  const tabC=document.getElementById('restab-classic'), tabB=document.getElementById('restab-bar5');
+  if(tabC){ tabC.textContent=t('resTabClassic'); tabC.classList.toggle('active',resultsTab==='classic'); tabC.onclick=()=>{ resultsTab='classic'; showResults(); }; }
+  if(tabB){ tabB.textContent=t('resTabBar'); tabB.classList.toggle('active',resultsTab==='bar5'); tabB.onclick=()=>{ resultsTab='bar5'; showResults(); }; }
   try{
-    const arr=JSON.parse(localStorage.getItem('pm_results')||'[]');
+    const arr=JSON.parse(localStorage.getItem('pm_results')||'[]').filter(r=>(r.mode||'classic')===resultsTab); // legacy entries count as Classic
     if(arr.length===0){
       list.innerHTML=`<div style="text-align:center;padding:20px;opacity:0.7">${t('resultsEmpty')}</div>`;
     } else {
@@ -1387,10 +1494,12 @@ function showResults(){
         const ds=d.toLocaleDateString()+' '+d.toLocaleTimeString().slice(0,5);
         const rank=i+1;
         const medal=rank===1?'gold':(rank===2?'silver':(rank===3?'bronze':''));
-        return `<div class="result-item" data-layout="${r.layout}"><div class="rank ${medal}">#${rank}</div><div class="rmain"><b class="rscore">${(r.score||0)} ${t('ptsShort')}</b> · ${getLayoutName(r.layout)}<div class="meta">${t('moves',{n:r.moves})} · ${r.time} · ${r.tester} • ${ds} • ${(SET_LABELS[r.texture]||r.texture||'')}</div></div></div>`;
+        return `<div class="result-item" data-layout="${r.layout}" data-mode="${r.mode||'classic'}"><div class="rank ${medal}">#${rank}</div><div class="rmain"><b class="rscore">${(r.score||0)} ${t('ptsShort')}</b> · ${getLayoutName(r.layout)}<div class="meta">${t('moves',{n:r.moves})} · ${r.time} · ${r.tester} • ${ds} • ${(SET_LABELS[r.texture]||r.texture||'')}</div></div></div>`;
       }).join('');
       list.querySelectorAll('.result-item').forEach(el=>{
-        el.onclick=()=>{ const k=el.dataset.layout; overlay.classList.remove('show'); if(LAYOUTS[k]||k==='scatter') genGame(k); };
+        el.onclick=()=>{ const k=el.dataset.layout, m=el.dataset.mode||'classic';
+          if(settings.mode!==m){ settings.mode=m; saveSettings(); document.body.classList.toggle('mode-bar5', m==='bar5'); syncModeSeg(); }
+          overlay.classList.remove('show'); if(LAYOUTS[k]||k==='scatter') genGame(k); };
       });
     }
   }catch(e){ list.innerHTML='<div>Error loading results</div>'; }
@@ -1399,9 +1508,12 @@ function showResults(){
 document.getElementById('btn-results').onclick=showResults;
 document.getElementById('btn-results-close').onclick=()=> document.getElementById('results-overlay').classList.remove('show');
 document.getElementById('results-overlay').addEventListener('click',e=>{ if(e.target.id==='results-overlay') e.currentTarget.classList.remove('show'); });
-document.getElementById('btn-results-clear').onclick=()=>{
-  if(confirm(currentLang==='pl'?'Wyczyścić wszystkie wyniki?':'Clear all results?')){
-    localStorage.removeItem('pm_results');
+document.getElementById('btn-results-clear').onclick=()=>{ // v4.47: clears only the visible mode's list
+  if(confirm(currentLang==='pl'?'Wyczyścić tę listę wyników?':'Clear this results list?')){
+    try{
+      const keep=JSON.parse(localStorage.getItem('pm_results')||'[]').filter(r=>(r.mode||'classic')!==(resultsTab||settings.mode));
+      localStorage.setItem('pm_results', JSON.stringify(keep));
+    }catch(e){ localStorage.removeItem('pm_results'); }
     document.getElementById('results-list').innerHTML=`<div style="text-align:center;padding:20px;opacity:0.7">${t('resultsEmpty')}</div>`;
   }
 };
