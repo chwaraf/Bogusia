@@ -2,7 +2,7 @@
 
 > Paste the prompt below into an AI coding agent (e.g. Arena.ai Agent Mode) with an
 > empty workspace and it will recreate this project. It encodes the full spec plus
-> every constraint learned over versions up to v4.51 — including the mistakes to avoid.
+> every constraint learned over versions up to v4.55 — including the mistakes to avoid.
 
 ---
 
@@ -94,19 +94,40 @@ scoring weight. Drainability must be tested with randomized orders (fixed orders
 strand vertical stacks even under the top-only rule); ground coverage is measured on
 the ground layer's own footprint.
 
-Initial pool (all must satisfy the rules above):
-twin side pyramids + flat 1-level middle field (46 tiles, 3 layers) · little towers
-on 4 corners + 1 in the middle, rest flat (46, 4) · four zigzag towers + middle mound
-(56, 6) · wide vertical ridge low at the ends/tall mid with side wings (62, 5) ·
-3-column skyscraper narrowing every two floors (50, 6) · portrait castle keep with
-3-wide walls (48, 4).
+**30 structures = a 10-level climb — 3 random builds per level** (`LEVEL_POOLS`,
+ordered easy → hard by the measured Monte-Carlo `diffB`; each deal draws one build
+from the level's pool at random; beat the highest unlocked level to unlock the
+next — `pm_h5level`; replay any unlocked level with ◀ ▶ on the start screen —
+`pm_h5sel`;
+the start line shows `Poziom N / 10 • ★… • 🎲×3`, the footer shows level + ★ during
+play; debug tag shows “🏗 Lv N name • tiles • ★…”; `LVL_TOTAL = LEVEL_POOLS.length`).
+**v4.55 hard rule: every build fits a 6×6 box** — max coordinate span 5 on every
+layer, enforced by the analyzer — so nothing ever needs panning on a phone:
+
+1. honeycomb (54) · mini donut ring (48) · micro bridges (50) — ★ w .80
+2. meadow + caps (44) · micro terraces (66) · sender tower (60) — ★ w .80
+3. mini canyon (60) · twin rails (52) · four garden beds (52) — ★★ w .80
+4. picnic benches (46) · courtyard walls (48) · mini checker + caps (48) — ★★ w .80
+5. mini windmill (48) · four keeps + mound (76) · crown table (58) — ★★★ w .80
+6. crush plate (62) · volcano (48) · zigzag posts (48) — ★★★ w .80
+7. four towers + caps (72) · twin mounds (46) · concentric offset rings (68) — ★★★★ w .80
+8. great wall micro (44) · twin chimneys mini (62) · pagoda plate (72) — ★★★★ w .92
+9. micro ziggurat (58) · twin pagodas (54) · mini keep (54) — ★★★★★ w 1.25
+10. deep spire (58) · 3-column skyscraper (50) · narrow bell tower (54) — ★★★★★ w 1.25
+
+Difficulty insight (v4.52, re-confirmed v4.55): barely anything correlates with
+covered-%; what drives bar-fulls is **how few tiles are free mid-game** — wide flat
+plates (crush plate, sender tower, four keeps) play EASY under the top-only rule no
+matter how dramatic they look, while narrow tall towers with offset floors (deep
+spire, skyscraper, bell tower) are the real bosses. Classic mode picks one random
+structure from the same 30-build flat pool (`STRUCTURE_GENS = LEVEL_POOLS.flat()`).
 
 ### Scoring
 
 Per matched pair: `mult = 1 + clamp((10−Δt)/5, 0, 2)` (up to 3× speed bonus);
 streak increments when Δt ≤ 5 s; **streak bonus only from streak ≥ 4**:
-`min(25, (streak−3)×5)`; points = `round(10×mult) + bonus`. Fire voice + on-screen
-fire effect trigger with the streak bonus.
+`min(25, (streak−3)×5)`; points = `round(10×mult×structureWeight) + bonus` (weight = the level's tier weight `LEVEL_META` in Hold-5, the drawn structure's own weight in Classic).
+Bravo voice + on-screen 👏 effect trigger with the streak bonus.
 
 Penalties (both reset the streak and show a red "−N" bubble): shuffle costs
 `min(60, 10 + 8×uses + ⌈pairsLeft/3⌉)`; **undo costs points** — `12 + 6×uses`
@@ -115,26 +136,62 @@ since undo is the only rescue from a full bar).
 
 ### Audio (recorded MP3 files in `sounds/`)
 
-- **“Fire!” / “Ogień!” streak voice**: natural-sounding recorded clips
+- **“Bravo!” / “Brawo!” streak voice** (renamed from Fire/Ogień in v4.52): natural-sounding recorded clips
   (1 EN clip, 5 PL clips mixing masculine/feminine). Rules: random pick that
   **never repeats the previous clip**, **8-second global throttle**, human TTS only
   as fallback if files are missing.
 - **Background music (Hold-5 only)**: 2 tracks alternating with a ~1.3 s **crossfade**
   between them, gentle ~2.6 s fade-in on start, fade-out on win/exit, and **each
-  playback starts at a random point 0–40 s** in. Music volume slider default 25
+  playback starts at a random point 0–40 s** in. Music volume slider default **13**
   where **slider 100% = 0.55 actual loudness** — music stays in the background.
 - **Ambience (Hold-5 only)**: real recorded loops — **rainfall + woodland birdsong**
   (CC BY-SA files with a CREDITS.md attribution; looped, soft per-element fades)
-  behind its own 🌧 slider (default 20), mixed at **70% of the music range**
+  behind its own 🌧 slider (default **8**), mixed at **70% of the music range**
   (rain ×0.9, birds ×0.55 of that target).
 - **Hold-5 backdrop**: a soft **blurred rainy-forest photo** behind the board
-  (CSS pseudo-element, ~7px blur, darkened so tiles stay readable; Classic keeps
+  (CSS pseudo-element, **2.5px blur** brightness 0.74 — sharpened in v4.52; the start
+  screen reuses the same photo at **1px blur**, v4.55; Classic keeps
   the plain felt gradient).
 - **Match sound = pentatonic ladder**: each cleared pair plays the next soft note
   (sine with two faint partials, ~0.4 s) ascending C-D-E-G-A…; the ladder resets
   after ~6 s of silence. Replacing pairs burst into ~7 golden petals drifting up.
+- Effects volume, music and ambience sliders each have their **own checkbox** — a
+  channel can be muted without losing its slider value (`pm_volen/pm_musen/pm_amben`).
 - UI click/match sounds behind a master volume slider (default 70) and a sound
   toggle; vibration via Capacitor Haptics with `navigator.vibrate` fallback.
+
+### Intro & hold bar (v4.53, finale redone v4.55)
+
+- **Intro on every launch (~4 s, tap to skip)**: Shrek-style frames — grandma with
+  glasses on a cottage couch → over-shoulder shot of her playing mahjong on her
+  smartphone → **grandma's human hands holding the phone, showing the REAL in-game
+  screenshot** (PIL perspective-composite of an actual Pile Match capture, rounded
+  corners + glass shine) with a gold serif **Witaj! / Welcome!** (`I18N.introWelcome`
+  — real overlaid text, never baked into an image). Implemented as 3 AI JPGs
+  (`intro/intro-1..3.jpg`) cross-fading with CSS Ken-Burns zooms; after the intro the
+  start prompt appears, floating **over the in-game forest at blur(1px)** (v4.55 —
+  nearly sharp; it used to be a 10px dim backdrop).
+- **Hold bar = floating marble slab**: `position:fixed` over the top-center of the
+  board (NO page band, `body.mode-bar5 #hold-bar` display only), smooth **marble
+  veins** (soft diagonal gradients — no speckle dots), pockets are polished carved
+  hollows with a **gold glowing `.droptarget` outline** during drags. Stones sit
+  **above** the slab (`overflow:visible`, mini z-index 2, drop-shadows).
+- **Drag & drop tiles onto the bar**: in Hold-5 the dragged stone becomes a
+  **fixed-position ghost rendering above the marble bar** (`dragGhost`, z-index 260000,
+  source tile dims to 28%); `barTargetIdx(x,y)` computes the auto-sorted insertion
+  pocket (first empty — auto-sort unchanged) and it glows gold; dropping calls
+  `onBarPick(tile, ghostRect)` (flight starts where you let go; full bar flashes).
+  Classic drag keeps the old in-board translate.
+- **Board fit never hides under the bar** (`boardTopInset()` in `fitAndCenter` and
+  `clampPan`), and in Hold-5 stones are **never smaller than the bar pockets** —
+  fit scale floor `0.762 = 64/84`; the widest builds are panned instead of shrunk.
+  Win dialogs use a bigger golden glowing congrats style (`.winbig`).
+### Changelog placement (v4.54)
+
+Version notes never appear in popups (start/win/lost prompts stay terse). The one
+place for them is **Settings → 📋 Changes/Zmiany**, which opens a small dialog showing
+the current `I18N.legal` text. `I18N.legal`/`settingsNote` are still updated every
+version in BOTH locales.
 
 ### Settings (persist everything in localStorage)
 

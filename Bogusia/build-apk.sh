@@ -15,7 +15,7 @@ export ANDROID_SDK_ROOT="$ANDROID_HOME"
 cd "$PROJECT"
 
 # 1) sync the latest web build into the app package
-mkdir -p www www/tiles www/tiles/hd36 www/sounds
+mkdir -p www www/tiles www/tiles/hd36 www/sounds www/intro
 cp "$WEB/index.html" "$WEB/manifest.json" www/
 cp "$WEB"/tiles/*.png www/tiles/
 cp "$WEB"/tiles/hd36/*.png www/tiles/hd36/ 2>/dev/null || true
@@ -23,6 +23,7 @@ rm -f www/sounds/*.mp3 www/sounds/*.ogg
 cp "$WEB"/sounds/*.mp3 "$WEB"/sounds/*.ogg www/sounds/ 2>/dev/null || true
 cp "$WEB"/sounds/CREDITS.md www/sounds/ 2>/dev/null || true
 cp "$WEB"/bg-ambient.jpg www/ 2>/dev/null || true
+cp "$WEB"/intro/*.jpg www/intro/ 2>/dev/null || true
 
 # 2) node deps (first run only needs the network)
 [ -d node_modules ] || npm install --no-audit --no-fund

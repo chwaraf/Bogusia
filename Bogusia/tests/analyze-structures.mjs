@@ -6,7 +6,8 @@
 //   node tests/analyze-structures.mjs [deals=200] [seed]
 //
 // Static asserts (must all PASS): even count, 44..80 tiles, no duplicate (x,y,z),
-// everything physically supported, >=50% ground coverage, >=3 columns wide,
+// everything physically supported, >=50% ground coverage, 3..6 columns wide,
+// v4.55: the WHOLE build (any layer) must fit a 6x6 box (span <=5),
 // fully drainable under the strictest rule set.
 //
 // Monte-Carlo: N random deals per structure per mode, played with the game's
@@ -34,7 +35,17 @@ function shuffle(arr,rng){ for(let i=arr.length-1;i>0;i--){ const j=(rng()*(i+1)
 // --- extract the STRUCTURES block from the game source (source of truth) ---
 const b0 = html.indexOf('// === STRUCTURES-BEGIN'), b1 = html.indexOf('// === STRUCTURES-END');
 if(b0 < 0 || b1 < 0){ console.error('STRUCTURES markers not found'); process.exit(2); }
-const gens = new Function(html.slice(b0, b1) + '; return STRUCTURE_GENS.map(g=>({fn:g,disp:g.disp||g.name, diff:g.diff||null, stars:g.stars||null}));')();
+const extracted = new Function(html.slice(b0, b1) + '; return { gens: STRUCTURE_GENS.map(g=>({fn:g,disp:g.disp||g.name, diff:g.diff||null, stars:g.stars||null})), pools: (typeof LEVEL_POOLS!=="undefined") ? LEVEL_POOLS.map(p=>p.map(g=>g.disp||g.name)) : null, meta: (typeof LEVEL_META!=="undefined") ? LEVEL_META : null };')();
+const gens = extracted.gens;
+// v4.55: the climb must be tiers of >=3 builds, all present in the flat pool
+if(extracted.pools){
+  const flat=new Set(gens.map(g=>g.disp));
+  extracted.pools.forEach((p,i)=>{
+    if(p.length<3){ console.log(`  ❌ level ${i+1}: pool has ${p.length} builds (<3)`); process.exit(2); }
+    p.forEach(n=>{ if(!flat.has(n)){ console.log(`  ❌ level ${i+1}: '${n}' missing from STRUCTURE_GENS`); process.exit(2); } });
+  });
+  console.log(`  LEVEL_POOLS: ${extracted.pools.length} levels × >=3 builds OK`);
+} else { console.log('  ❌ LEVEL_POOLS not found in STRUCTURES block'); process.exit(2); }
 
 // --- rule mirrors (constants copied 1:1 from index.html) ---
 const isOver = (a,b) => Math.abs(a.x-b.x)<0.9 && Math.abs(a.y-b.y)<0.9;
@@ -117,6 +128,12 @@ function asserts(pts, name, warns=[]){
   const W=Math.max(...xs)-Math.min(...xs)+1, H=Math.max(...ys)-Math.min(...ys)+1;
   if(z0.length/(W*H)<0.5) errs.push(`ground fill ${(z0.length/(W*H)*100)|0}% <50%`); // footprint of the ground layer (matches design docs)
   if(W<3) errs.push('width <3');
+  if(W>6) errs.push('width '+W+' >6');                       // v4.55: everything fits a 6x6 box
+  if(H>6) errs.push('height '+H+' >6');
+  const ax=pts.map(p=>p.x), ay=pts.map(p=>p.y);             // upper layers must stay inside the box too
+  const Wg=Math.max(...ax)-Math.min(...ax)+1, Hg=Math.max(...ay)-Math.min(...ay)+1;
+  if(Wg>6) errs.push('global width '+Wg+' >6 (upper layer sticks out)');
+  if(Hg>6) errs.push('global height '+Hg+' >6 (upper layer sticks out)');
   // drainable = a removal order EXISTS. Fixed orders can strand vertical stacks even
   // under the top-only rule, so sample 200 random free-pair orders per rule set.
   const drainsOk=(mode)=>{ for(let att=0; att<200; att++){

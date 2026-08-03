@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Pile Match v4.51 - Mahjong HD tile set, structure star difficulty + weighted scoring - Bogusia</title>
+<title>Pile Match v4.55 - 10 levels x 3 random 6x6 builds, sharper forest start, real in-game intro shot - Bogusia</title>
 <meta name="theme-color" content="#1a321c">
 <link rel="manifest" href="manifest.json">
 <style>
@@ -19,7 +19,7 @@
   .lang-btn{background:transparent;box-shadow:none;padding:4px 9px;font-size:12.5px;border-radius:5px;min-width:30px;border:0;color:#e8f5e9;cursor:pointer}
   .lang-btn.active{background:#2e6b32}
   #board-wrap{flex:1;position:relative;overflow:hidden;isolation:isolate;background:radial-gradient(ellipse at 30% 20%, #2f4a30 0%, transparent 55%), radial-gradient(ellipse at 70% 80%, #1a321c 0%, #0a180a 70%), #0e1b0f;touch-action:none;display:block}
-  body.mode-bar5 #board-wrap::before{content:'';position:absolute;inset:-26px;background:url('bg-ambient.jpg') center/cover no-repeat;filter:blur(7px) brightness(0.62) saturate(0.95);z-index:0;pointer-events:none} /* v4.49 */
+  body.mode-bar5 #board-wrap::before{content:'';position:absolute;inset:-26px;background:url('bg-ambient.jpg') center/cover no-repeat;filter:blur(2.5px) brightness(0.74) saturate(1.0);z-index:0;pointer-events:none} /* v4.52: sharper forest */
   #board{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
   .tile{position:absolute;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;transition:transform 0.14s, border-color 0.14s, opacity 0.20s;width:var(--tile-w);height:var(--tile-h);overflow:hidden;background:transparent;border:0;transform:translateZ(0);will-change:transform,opacity}
   .tile-face{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;text-align:center;line-height:1;pointer-events:none;z-index:1;position:relative;overflow:hidden;border-radius:10px;background:transparent}
@@ -243,12 +243,13 @@
   .tgl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:2px}
   .tgl-cell{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:9.5px;font-weight:700;color:#4a3520;padding:3px 0}
   /* v4.34 Hold-5 bar mode: stone slab with carved pockets */
-  #hold-bar{display:none;align-items:center;justify-content:center;background:linear-gradient(180deg,#1b2a1d 0%,#101f13 100%);border-bottom:1px solid #2a4f2e;box-shadow:0 4px 10px rgba(0,0,0,0.35);padding:8px 6px 10px;z-index:15;overflow:hidden}
+  #hold-bar{display:none;position:fixed;top:8px;left:50%;transform:translateX(-50%);align-items:center;justify-content:center;padding:0;z-index:600;overflow:visible;pointer-events:none} /* v4.53: floats over the board, no page band */
   body.mode-bar5 #hold-bar{display:flex}
-  #hold-bar-inner{display:flex;gap:9px;padding:11px 13px;border-radius:17px;transform-origin:top center;position:relative;background:linear-gradient(180deg,#9aa19b 0%,#878d88 7%,#707670 45%,#5b615c 78%,#4d524e 100%);border:1px solid #454a46;box-shadow:inset 0 2px 0 rgba(255,255,255,0.32), inset 0 -3px 8px rgba(0,0,0,0.38), 0 7px 16px rgba(0,0,0,0.5)}
+  #hold-bar-inner{display:flex;gap:9px;padding:11px 13px;border-radius:17px;transform-origin:top center;position:relative;pointer-events:none;background-image:radial-gradient(ellipse 300px 80px at 22% 20%, rgba(255,255,255,0.16), transparent 62%),linear-gradient(118deg, transparent 33%, rgba(240,236,228,0.17) 40%, transparent 47%, rgba(236,230,216,0.10) 55%, transparent 63%),linear-gradient(64deg, transparent 50%, rgba(210,202,188,0.14) 58%, transparent 67%),linear-gradient(180deg,#cdc8bd 0%,#b3ada2 10%,#938d82 42%,#6e6963 78%,#58544d 100%);border:1px solid #4c4740;box-shadow:inset 0 2px 0 rgba(255,255,255,0.40), inset 0 -4px 12px rgba(0,0,0,0.36), inset 0 0 30px rgba(0,0,0,0.10), 0 8px 20px rgba(0,0,0,0.55)} /* v4.53: smooth marble, veins instead of speckles */
   #hold-bar-inner::before{content:'';position:absolute;inset:2px;border-radius:15px;pointer-events:none;background:radial-gradient(ellipse 260px 46px at 32% 0%, rgba(255,255,255,0.16), transparent 62%)}
-  .hslot{width:64px;height:84px;border-radius:12px;position:relative;overflow:hidden;background:linear-gradient(180deg,#383d3a,#2b2f2c);box-shadow:inset 0 5px 10px rgba(0,0,0,0.66), inset 3px 0 6px rgba(0,0,0,0.42), inset -3px 0 6px rgba(0,0,0,0.42), inset 0 -2px 3px rgba(255,255,255,0.07), 0 1px 0 rgba(255,255,255,0.24)}
-  .hslot .mini{width:84px;height:110px;transform:scale(0.72);transform-origin:top left;pointer-events:none;margin-top:1px;margin-left:1px;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.55));transition:transform 0.2s, opacity 0.2s}
+  .hslot{width:64px;height:84px;border-radius:12px;position:relative;overflow:visible;background:linear-gradient(160deg,#4b4741 0%,#35322c 55%,#2a2723 100%);border:1px solid rgba(0,0,0,0.52);box-shadow:inset 0 6px 12px rgba(0,0,0,0.72), inset 0 -3px 6px rgba(255,255,255,0.07), 0 1px 0 rgba(255,255,255,0.30);transition:outline-color .12s, box-shadow .12s;outline:3px solid rgba(255,213,79,0);outline-offset:2px}
+  .hslot.droptarget{outline:3px solid #ffd54f;box-shadow:inset 0 6px 12px rgba(0,0,0,0.5), 0 0 18px rgba(255,213,79,0.9), 0 0 34px rgba(255,213,79,0.45), 0 1px 0 rgba(255,255,255,0.30)}
+  .hslot .mini{width:84px;height:110px;transform:scale(0.72);transform-origin:top left;pointer-events:none;margin-top:-2px;margin-left:1px;position:relative;z-index:2;filter:drop-shadow(0 3px 4px rgba(0,0,0,0.6)) drop-shadow(0 1px 1px rgba(0,0,0,0.45));transition:transform 0.2s, opacity 0.2s} /* v4.53: stones sit ABOVE the marble */
   .hslot .mini .tile-face{position:relative}
   /* dot/dots-block sets must look IDENTICAL in pockets (no radius/clip of their own 3D structure) */
   body.texture-default .hslot .mini .tile-face,
@@ -263,20 +264,52 @@
   @keyframes barflash{0%{box-shadow:inset 0 0 0 999px rgba(229,57,53,0)}40%{box-shadow:inset 0 0 0 999px rgba(229,57,53,0.35)}100%{box-shadow:inset 0 0 0 999px rgba(229,57,53,0)}}
   #tile-tip{position:fixed;z-index:200000;pointer-events:none;background:rgba(8,18,10,0.94);color:#d8f3dc;border:1px solid #52b788;border-radius:9px;padding:5px 10px;font:11px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;display:none;box-shadow:0 4px 14px rgba(0,0,0,0.5);max-width:74vw;white-space:nowrap}
   #tile-tip b{color:#ffd54f}
+  /* v4.52: compact footer stats (top header removed) */
+  #foot-stats{display:flex;flex-direction:column;justify-content:center;gap:2px;background:rgba(0,0,0,0.28);border:1px solid #2a4f2e;border-radius:9px;padding:4px 8px;line-height:1.3;min-width:96px}
+  #foot-stats .fs-row{display:flex;justify-content:space-between;align-items:center;gap:9px;font-size:11px;font-weight:800;color:#d8f3dc;font-variant-numeric:tabular-nums;white-space:nowrap}
+  #foot-stats #fstars{color:#ffd54f;letter-spacing:0.5px}
+  #foot-stats #flevel{color:#ffe082}
+  /* v4.52: volume checkboxes + start-screen options dropdown */
+  .vchk{width:17px;height:17px;accent-color:#2e7d32;margin:0;flex:none}
+  .vol-off{opacity:0.4;pointer-events:none}
+  #start-options{display:none;margin-top:10px;border-top:1px solid #e8dcbb;padding-top:8px;text-align:left}
+  #btn-start-opts{margin-top:8px;width:100%;font-size:12px;padding:9px 10px;min-height:34px}
+  /* v4.55: start card floats over the in-game forest, almost sharp (1px, was 10px dim) */
+  #start-overlay{backdrop-filter:none !important;background:linear-gradient(180deg, rgba(8,22,12,0.34) 0%, rgba(3,10,6,0.58) 100%)}
+  #start-overlay::before{content:'';position:absolute;inset:0;background:url('bg-ambient.jpg') center/cover no-repeat;filter:blur(1px) brightness(0.8) saturate(1.06);z-index:0;pointer-events:none}
+  #start-overlay .card{z-index:1}
+  #start-level-line{font-size:12.5px;font-weight:800;color:#3e2723;margin:0 0 8px;display:none;align-items:center;justify-content:center;gap:8px}
+  .lvbtn{background:linear-gradient(180deg,#fff8e0,#f5e6c8);border:1.5px solid #c9b896;border-radius:8px;min-width:30px;min-height:26px;font-size:12px;font-weight:900;color:#3e2723;cursor:pointer;box-shadow:0 2px 0 #a8966f}
+  .lvbtn:active{transform:translateY(2px);box-shadow:none}
+  .lvbtn[disabled]{opacity:0.35;pointer-events:none}
+  /* v4.53: Shrek-style intro — grandma's game becomes yours */
+  #intro-overlay{position:fixed;inset:0;z-index:50000;background:#000;display:none;overflow:hidden;touch-action:none;transition:opacity 0.4s ease}
+  #intro-overlay.show{display:block}
+  #intro-overlay.out{opacity:0}
+  #intro-overlay .fr{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.55s ease;will-change:transform,opacity}
+  #intro-overlay .fr.vis{opacity:1}
+  @keyframes introA{from{transform:scale(1.02)}to{transform:scale(1.17)}}
+  @keyframes introB{from{transform:scale(1.06)}to{transform:scale(1.30)}}
+  @keyframes introC{from{transform:scale(1.0)}to{transform:scale(1.45)}}
+  #intro-overlay .fr1.vis{animation:introA 1.6s linear forwards}
+  #intro-overlay .fr2.vis{animation:introB 1.25s linear forwards}
+  #intro-overlay .fr3.vis{animation:introC 1.9s linear forwards;transform-origin:50% 46%}
+  #intro-text{position:absolute;left:50%;top:45%;transform:translate(-50%,-50%) scale(0.65);font-family:Georgia,'Times New Roman',serif;font-size:min(14vw,62px);font-weight:900;letter-spacing:0.10em;color:#ffe9a8;background:linear-gradient(180deg,#fff6cf 8%,#ffd76a 45%,#c98f1b 92%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.8)) drop-shadow(0 0 16px rgba(255,220,120,0.55));opacity:0;transition:opacity 0.45s ease,transform 0.45s cubic-bezier(.2,1.4,.4,1);white-space:nowrap;z-index:2}
+  #intro-text.vis{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  /* v4.54: dragged stone flies ABOVE the bar as a ghost; source dims */
+  .drag-ghost{position:fixed;z-index:260000;pointer-events:none;transform-origin:50% 100%;filter:drop-shadow(0 16px 20px rgba(0,0,0,0.55));opacity:0.98}
+  .tile.drag-src{opacity:0.28 !important;filter:none !important;box-shadow:none !important}
+  @keyframes winGlow{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+  .card h2.winbig{font-size:min(8.5vw,38px);letter-spacing:0.5px;margin:2px 0 6px;background:linear-gradient(180deg,#fffbe0 12%,#ffd83d 48%,#e09a00 92%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:#d4a017;filter:drop-shadow(0 3px 3px rgba(60,30,0,0.55)) drop-shadow(0 0 18px rgba(255,214,64,0.5));animation:winGlow 1.6s ease-in-out 2;line-height:1.15}
 </style>
 </head>
 <body>
-<header>
-  <div class="left">
-    <h1 id="app-title">Pile Match</h1>
-    <span class="badge-tester" id="tester-badge">👩‍💻 Tester: Bogusia</span>
-  </div>
-  <div class="stats">
-    <span id="timer">00:00</span>
-    <span id="pairs">0 par</span>
-    <span id="moves">0 ruchów</span>
-  </div>
-</header>
+<div id="intro-overlay">
+  <img class="fr fr1" src="intro/intro-1.jpg" alt="">
+  <img class="fr fr2" src="intro/intro-2.jpg" alt="">
+  <img class="fr fr3" src="intro/intro-3.jpg" alt="">
+  <div id="intro-text"></div>
+</div>
 
 <div id="hold-bar">
   <div id="hold-bar-inner">
@@ -291,6 +324,10 @@
 </div>
 
 <footer>
+  <div id="foot-stats">
+    <div class="fs-row"><span id="timer">00:00</span><span id="pairs">0</span></div>
+    <div class="fs-row" id="fs-row2"><span id="flevel">Poz. 1</span><span id="fstars">★☆☆☆☆</span></div>
+  </div>
   <div class="footer-group" id="footer-left">
     <button id="btn-hint">💡<span class="blab" id="lab-hint">Hint</span></button>
     <button id="btn-undo" class="secondary">↩<span class="blab" id="lab-undo">Undo</span></button>
@@ -299,9 +336,7 @@
     <button id="btn-results" class="secondary">🏆<span class="blab" id="lab-results">Results</span></button>
   </div>
   <div class="footer-group" id="footer-zoom">
-    <button id="btn-zoom-out" class="secondary">−</button>
     <button id="btn-zoom-reset" class="secondary">⤧</button>
-    <button id="btn-zoom-in" class="secondary">+</button>
   </div>
   <div id="score-box" title="Score" style="margin:0 auto"><div class="srow"><span class="sico">⭐</span><span id="score-val">0</span></div><span class="slab" id="lab-score">pts</span></div>
   <div class="footer-group" id="footer-right" style="gap:6px">
@@ -317,7 +352,6 @@
     <input id="tester-input" type="text"/>
     <div class="layout-picker" id="layout-picker"></div>
     <button id="overlay-btn" style="width:100%;margin-top:10px"></button>
-    <p class="small-note" id="legal-note"></p>
   </div>
 </div>
 
@@ -335,17 +369,21 @@
 </div>
 
 <div id="start-overlay" class="overlay">
-  <div class="card" style="text-align:left">
+  <div class="card" style="text-align:center">
     <h2 id="start-title" style="text-align:center;margin-bottom:6px">🀄 Pile Match</h2>
-    <div style="display:flex;justify-content:center;margin-bottom:6px"><div class="seg"><button class="langbtn" data-lang="en">EN</button><button class="langbtn" data-lang="pl">PL</button></div></div>
-    <div class="start-sec" id="start-mode-lbl">🧩 Mode</div>
-    <div style="display:flex;justify-content:center;margin-bottom:4px"><div class="seg"><button class="smodebtn" data-mode="classic">Classic</button><button class="smodebtn" data-mode="bar5">Hold 5</button></div></div>
-    <div class="start-sec" id="start-layout-lbl">🗺 Layout</div>
-    <div class="layout-picker" id="start-layout-picker" style="margin:6px 0 4px"></div>
-    <div class="start-sec" id="start-set-lbl">🎨 Set</div>
-    <div id="start-set-grid" class="set-grid"></div>
-    <button id="btn-start" style="width:100%;margin-top:14px">▶ Start</button>
-    <p class="small-note" id="start-best" style="text-align:center;margin-top:10px"></p>
+    <div id="start-level-line"></div>
+    <button id="btn-start" style="width:100%;margin-top:2px">▶ Start</button>
+    <p class="small-note" id="start-best" style="text-align:center;margin-top:8px"></p>
+    <button id="btn-start-opts" class="btn-cream">⚙ Ustawienia</button>
+    <div id="start-options">
+      <div style="display:flex;justify-content:center;margin-bottom:6px"><div class="seg"><button class="langbtn" data-lang="en">EN</button><button class="langbtn" data-lang="pl">PL</button></div></div>
+      <div class="start-sec" id="start-mode-lbl">🧩 Mode</div>
+      <div style="display:flex;justify-content:center;margin-bottom:4px"><div class="seg"><button class="smodebtn" data-mode="classic">Classic</button><button class="smodebtn" data-mode="bar5">Hold 5</button></div></div>
+      <div id="start-layout-sec"><div class="start-sec" id="start-layout-lbl">🗺 Layout</div>
+      <div class="layout-picker" id="start-layout-picker" style="margin:6px 0 4px"></div></div>
+      <div class="start-sec" id="start-set-lbl">🎨 Set</div>
+      <div id="start-set-grid" class="set-grid"></div>
+    </div>
   </div>
 </div>
 
@@ -373,6 +411,14 @@
   </div>
 </div>
 
+<div id="changes-overlay" class="overlay">
+  <div class="card">
+    <h2 id="changes-title" style="text-align:center">📋 Zmiany</h2>
+    <p id="changes-text" style="text-align:left;font-size:12.5px;line-height:1.5"></p>
+    <button id="btn-changes-close" style="width:100%;margin-top:10px">✅ Zamknij</button>
+  </div>
+</div>
+
 <div id="settings-overlay" class="overlay">
   <div class="card" style="text-align:left">
     <h2 id="settings-title" style="text-align:center">⚙ Ustawienia</h2>
@@ -396,9 +442,9 @@
       </select>
     </div>
     <div class="setting-row"><span class="setting-label" id="label-mode">🧩 Mode</span><div class="seg"><button class="modebtn" data-mode="classic">Classic</button><button class="modebtn" data-mode="bar5">Hold 5</button></div></div>
-    <div class="setting-row"><span class="setting-label" id="label-volume">🔊 Głośność</span><div style="display:flex;align-items:center;gap:6px"><input type="range" id="vol-slider" min="0" max="150" step="5"><span id="vol-value" style="font-size:11px;min-width:28px">60%</span></div></div>
-    <div class="setting-row"><span class="setting-label" id="label-amb">🌧 Otoczenie</span><div style="display:flex;align-items:center;gap:6px"><input type="range" id="amb-vol-slider" min="0" max="100" step="5"><span id="amb-vol-value" style="font-size:11px;min-width:28px">20%</span></div></div>
-    <div class="setting-row"><span class="setting-label" id="label-music">🎵 Muzyka</span><div style="display:flex;align-items:center;gap:6px"><input type="range" id="music-vol-slider" min="0" max="100" step="5"><span id="music-vol-value" style="font-size:11px;min-width:28px">25%</span></div></div>
+    <div class="setting-row"><span class="setting-label" id="label-volume">🔊 Głośność</span><div style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="vol-enable" class="vchk" checked><input type="range" id="vol-slider" min="0" max="150" step="5"><span id="vol-value" style="font-size:11px;min-width:28px">70%</span></div></div>
+    <div class="setting-row"><span class="setting-label" id="label-amb">🌧 Otoczenie</span><div style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="amb-enable" class="vchk" checked><input type="range" id="amb-vol-slider" min="0" max="100" step="5"><span id="amb-vol-value" style="font-size:11px;min-width:28px">8%</span></div></div>
+    <div class="setting-row"><span class="setting-label" id="label-music">🎵 Muzyka</span><div style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="music-enable" class="vchk" checked><input type="range" id="music-vol-slider" min="0" max="100" step="5"><span id="music-vol-value" style="font-size:11px;min-width:28px">13%</span></div></div>
     <div class="setting-row" style="display:block;padding:5px 0"><div class="tgl-grid">
       <div class="tgl-cell"><span id="label-sound">🔔 Dźwięk</span><div class="toggle" id="toggle-sound"></div></div>
       <div class="tgl-cell"><span id="label-vib">📳 Wibracje</span><div class="toggle" id="toggle-vib"></div></div>
@@ -407,22 +453,22 @@
       <div class="tgl-cell"><span id="label-random">🎲 Random</span><div class="toggle" id="toggle-random-texture"></div></div>
       <div class="tgl-cell"><span id="label-debug">🔍 Debug</span><div class="toggle" id="toggle-debug"></div></div>
     </div></div>
+    <div style="text-align:center;margin:2px 0 6px"><button id="btn-changes" class="btn-cream" style="font-size:12px;padding:7px 14px;min-height:32px">📋 Zmiany</button></div>
     <div class="setting-row"><span class="setting-label" id="label-tester2">👩 Testerka</span><input id="settings-tester-input" type="text" style="width:100px;padding:5px;border-radius:7px;border:1px solid #c9b896;font-size:11px;text-align:center"></div>
     <div style="display:flex;gap:10px;margin-top:14px"><button id="btn-settings-close" style="flex:1">✅ Zamknij</button><button id="btn-settings-reset" class="secondary" style="flex:1">🔄 Reset</button></div>
-    <p class="small-note" id="settings-note" style="text-align:center"></p>
   </div>
 </div>
 
 <script>
 const I18N={
- en:{appTitle:"Pile Match",pairs:"{n} pairs",moves:"{n} moves",hint:"💡",undo:"↩",shuffle:"🔀",layout:"🗺",results:"🏆",newGame:"New",playAgain:"▶ Play Again",winTitle:"🎉 Win!",winMsg:"{score} pts — {layout}, {moves} moves, {time}",stuckTitle:"😵 Stuck!",stuckMsg:"No free pairs! Try shuffle or undo.",shuffledTitle:"",shuffledMsg:"",noHintsTitle:"No hints",noHintsMsg:"No pairs.",chooseLayoutTitle:"🎮 Layout",chooseLayoutMsg:"Pick a layout:",testerLabel:"Tester: {name}",testerInputPH:"Tester name",legal:"v4.51: new Mahjong HD tile set — 36 individual riichi tiles incl. red fives (now the default). Structures have a measured difficulty from a Monte-Carlo analyzer (tests/): ★ rating shown in debug mode and points scale with it — skyscraper/quad towers +25%, corner towers −20%.",layouts:{easy:"Easy 72",medium:"Medium 112",hard:"Turtle 144",senior:"Senior 72",bricks:"Bricks 74",scatter:"Structures"},zoomHint:"10px pile • Bubbles!",btnHint:"Hint",btnUndo:"Undo",btnShuffle:"Shuffle",btnLayout:"Layout",btnResults:"Results",randomLbl:"🎲 Random set",badgesLbl:"✔/🔒 Free marks",debugLbl:"🔍 Debug info",testerLbl2:"👩 Tester",settingsTitle:"⚙ Settings",volume:"🔊 Vol",music:"🎵 Music",amb:"🌧 Ambience",sound:"🔔 Sound",vib:"📳 Vib",anim:"✨ Bubbles",perf:"🎲 3D",perfFast:"Simple",perfQuality:"Real",close:"✅ Close",reset:"🔄 Reset",lang:"Lang",resultsTitle:"🏆 Results",resultsEmpty:"No results yet.",langLbl:"🌐 Language",setLbl:"🎨 Tile set",ptsShort:"pts",clear:"🗑 Clear",resultsNote:"Tap a result to replay it.",startLayoutLbl:"🗺 Layout",startBtn:"▶ Start game",startBest:"🏆 Best on this layout: {n} pts",startBestNone:"No runs on this layout yet",modeLbl:"🧩 Mode",modeClassicLbl:"Classic",modeBarLbl:"Hold 5",resTabClassic:"🧩 Classic",resTabBar:"🖐 Hold 5",congratsX:"🎉 Congratulations!",congrats10:"👏 Sincere congratulations!",congrats3:"🌟 Super congratulations!",congrats1:"🏆 Championship!",winPlaceTxt:"{score} pts • place {place} of {total}",btnNewGame:"▶ New game",btnHome:"🏠 Start screen",barFullTitle:"😟 Bar full!",barFullMsg:"No room, no pair. Shuffle also frees a pocket.",settingsNote:"v4.51: Mahjong HD set (36 tiles incl. red 5s, default); structure star difficulty from Monte-Carlo analysis (debug: ★ display); scoring weighted by difficulty (±20-25%)."},
- pl:{appTitle:"Dopasuj",pairs:"{n} par",moves:"{n} ruchów",hint:"💡",undo:"↩",shuffle:"🔀",layout:"🗺",results:"🏆",newGame:"Nowa",playAgain:"▶ Zagraj",winTitle:"🎉 Wygrana!",winMsg:"{score} pkt — {layout}, {moves} ruchów, {time}",stuckTitle:"😵 Brak ruchów!",stuckMsg:"Brak par! Tasuj.",shuffledTitle:"",shuffledMsg:"",noHintsTitle:"Brak",noHintsMsg:"Brak par.",chooseLayoutTitle:"🎮 Układ",chooseLayoutMsg:"Wybierz układ:",testerLabel:"Testerka: {name}",testerInputPH:"Imię testerki",legal:"v4.51: nowy zestaw Mahjong HD — 36 osobnych kamieni riichi z czerwonymi piątkami (teraz domyślny). Konstrukcje mają zmierzoną trudność analizatorem Monte-Carlo (tests/): gwiazdki ★ w trybie debug, a punkty rosną z trudnością — wieżowiec i cztery wieże +25%, wieżyczki w rogach −20%.",layouts:{easy:"Łatwy 72",medium:"Średni 112",hard:"Żółw 144",senior:"Senior 72",bricks:"Cegły 74",scatter:"Konstrukcje"},zoomHint:"Warstwy 10px • Bąbelki!",btnHint:"Podpowiedź",btnUndo:"Cofnij",btnShuffle:"Tasuj",btnLayout:"Układ",btnResults:"Wyniki",randomLbl:"🎲 Losowy zestaw",badgesLbl:"✔/🔒 Znaczniki",debugLbl:"🔍 Debug",testerLbl2:"👩 Testerka",settingsTitle:"⚙ Ustawienia",volume:"🔊 Głośność",music:"🎵 Muzyka",amb:"🌧 Otoczenie",sound:"🔔 Dźwięk",vib:"📳 Wibracje",anim:"✨ Bąbelki",perf:"🎲 3D",perfFast:"Prosty",perfQuality:"Real",close:"✅ Zamknij",reset:"🔄 Resetuj",lang:"Język",resultsTitle:"🏆 Wyniki",resultsEmpty:"Brak wyników.",langLbl:"🌐 Język",setLbl:"🎨 Zestaw",ptsShort:"pkt",clear:"🗑 Wyczyść",resultsNote:"Dotknij wyniku, aby zagrać ponownie.",startLayoutLbl:"🗺 Układ",startBtn:"▶ Rozpocznij grę",startBest:"🏆 Rekord w tym układzie: {n} pkt",startBestNone:"Brak gier w tym układzie",modeLbl:"🧩 Tryb",modeClassicLbl:"Klasyczny",modeBarLbl:"Pasek 5",resTabClassic:"🧩 Klasyczny",resTabBar:"🖐 Pasek 5",congratsX:"🎉 Gratulacje!",congrats10:"👏 Szczere gratulacje!",congrats3:"🌟 Super gratulacje!",congrats1:"🏆 Mistrzostwo!",winPlaceTxt:"{score} pkt • miejsce {place} z {total}",btnNewGame:"▶ Nowa gra",btnHome:"🏠 Ekran startowy",barFullTitle:"😟 Pasek pełny!",barFullMsg:"Brak miejsca i pary. Tasuj zwolni też kieszeń.",settingsNote:"v4.51: zestaw Mahjong HD (36 kamieni, domyślny); gwiazdki trudności konstrukcji z analizy Monte-Carlo (debug); punktacja ważona trudnością (±20-25%)."}
+ en:{appTitle:"Pile Match",pairs:"{n} pairs",moves:"{n} moves",hint:"💡",undo:"↩",shuffle:"🔀",layout:"🗺",results:"🏆",newGame:"New",playAgain:"▶ Play Again",winTitle:"🎉 Win!",winMsg:"{score} pts — {layout}, {moves} moves, {time}",stuckTitle:"😵 Stuck!",stuckMsg:"No free pairs! Try shuffle or undo.",shuffledTitle:"",shuffledMsg:"",noHintsTitle:"No hints",noHintsMsg:"No pairs.",chooseLayoutTitle:"🎮 Layout",chooseLayoutMsg:"Pick a layout:",testerLabel:"Tester: {name}",testerInputPH:"Tester name",legal:"v4.55: the intro finale now shows grandma's human hands holding a phone with the REAL in-game screenshot on it, and the greeting says Witaj!. The start card floats over the forest — almost sharp now (1px blur instead of 10px). Big layout rebuild: every structure fits a 6×6 box, so nothing ever needs panning. The Hold-5 climb is now 10 levels, each drawing randomly from 3 different builds — 30 structures total, favourites rearranged into 6×6 plus new ones (picnic benches, garden beds, honeycomb, volcano, crush plate, deep spire…). Every level feels fresh each visit.",layouts:{easy:"Easy 72",medium:"Medium 112",hard:"Turtle 144",senior:"Senior 72",bricks:"Bricks 74",scatter:"Structures"},zoomHint:"10px pile • Bubbles!",btnHint:"Hint",btnUndo:"Undo",btnShuffle:"Shuffle",btnLayout:"Layout",btnResults:"Results",randomLbl:"🎲 Random set",badgesLbl:"✔/🔒 Free marks",debugLbl:"🔍 Debug info",testerLbl2:"👩 Tester",settingsTitle:"⚙ Settings",volume:"🔊 Vol",music:"🎵 Music",amb:"🌧 Ambience",sound:"🔔 Sound",vib:"📳 Vib",anim:"✨ Bubbles",perf:"🎲 3D",perfFast:"Simple",perfQuality:"Real",close:"✅ Close",reset:"🔄 Reset",lang:"Lang",resultsTitle:"🏆 Results",resultsEmpty:"No results yet.",langLbl:"🌐 Language",setLbl:"🎨 Tile set",ptsShort:"pts",clear:"🗑 Clear",resultsNote:"Tap a result to replay it.",startLayoutLbl:"🗺 Layout",startBtn:"▶ Start",levelLbl:"Level {n}",lvlNext:" 🏗 Level {n} unlocked!",lvlMax:" 🏆 Max level — champion run!",lvlShort:"Lv",startBest:"🏆 Best on this layout: {n} pts",startBestNone:"No runs on this layout yet",modeLbl:"🧩 Mode",modeClassicLbl:"Classic",modeBarLbl:"Hold 5",resTabClassic:"🧩 Classic",resTabBar:"🖐 Hold 5",introWelcome:"Welcome!",changesLbl:"📋 Changes",congratsX:"🎉 Congratulations!",congrats10:"👏 Sincere congratulations!",congrats3:"🌟 Super congratulations!",congrats1:"🏆 Championship!",winPlaceTxt:"{score} pts • place {place} of {total}",btnNewGame:"▶ New game",btnHome:"🏠 Start screen",barFullTitle:"😟 Bar full!",barFullMsg:"No room, no pair. Shuffle also frees a pocket.",settingsNote:"v4.55: real in-game screenshot in the intro finale (human hands); Witaj!; start card over nearly-sharp forest; every build ≤6×6 (no panning); climb = 10 levels × 3 random builds (30 structures)."},
+ pl:{appTitle:"Dopasuj",pairs:"{n} par",moves:"{n} ruchów",hint:"💡",undo:"↩",shuffle:"🔀",layout:"🗺",results:"🏆",newGame:"Nowa",playAgain:"▶ Zagraj",winTitle:"🎉 Wygrana!",winMsg:"{score} pkt — {layout}, {moves} ruchów, {time}",stuckTitle:"😵 Brak ruchów!",stuckMsg:"Brak par! Tasuj.",shuffledTitle:"",shuffledMsg:"",noHintsTitle:"Brak",noHintsMsg:"Brak par.",chooseLayoutTitle:"🎮 Układ",chooseLayoutMsg:"Wybierz układ:",testerLabel:"Testerka: {name}",testerInputPH:"Imię testerki",legal:"v4.55: finał intra pokazuje ludzkie dłonie babci trzymające telefon z PRAWDZIWYM zrzutem gry, a powitanie to Witaj!. Karta startowa unosi się nad lasem — prawie ostrym (rozmycie 1px zamiast 10px). Wielka przebudowa układów: każda konstrukcja mieści się w pudełku 6×6, więc nic nie trzeba przesuwać. Drabinka Paska 5 to teraz 10 poziomów, każdy losuje z 3 różnych budowli — łącznie 30 konstrukcji: ulubione przestawione do 6×6 plus nowe (ławki piknikowe, grządki, plaster miodu, wulkan, prasowana płyta, głęboka iglica…). Każdy poziom zaskakuje na nowo.",layouts:{easy:"Łatwy 72",medium:"Średni 112",hard:"Żółw 144",senior:"Senior 72",bricks:"Cegły 74",scatter:"Konstrukcje"},zoomHint:"Warstwy 10px • Bąbelki!",btnHint:"Porada",btnUndo:"Cofnij",btnShuffle:"Tasuj",btnLayout:"Układ",btnResults:"Wyniki",randomLbl:"🎲 Losowy zestaw",badgesLbl:"✔/🔒 Znaczniki",debugLbl:"🔍 Debug",testerLbl2:"👩 Testerka",settingsTitle:"⚙ Ustawienia",volume:"🔊 Głośność",music:"🎵 Muzyka",amb:"🌧 Otoczenie",sound:"🔔 Dźwięk",vib:"📳 Wibracje",anim:"✨ Bąbelki",perf:"🎲 3D",perfFast:"Prosty",perfQuality:"Real",close:"✅ Zamknij",reset:"🔄 Resetuj",lang:"Język",resultsTitle:"🏆 Wyniki",resultsEmpty:"Brak wyników.",langLbl:"🌐 Język",setLbl:"🎨 Zestaw",ptsShort:"pkt",clear:"🗑 Wyczyść",resultsNote:"Dotknij wyniku, aby zagrać ponownie.",startLayoutLbl:"🗺 Układ",startBtn:"▶ Start",levelLbl:"Poziom {n}",lvlNext:" 🏗 Poziom {n} odblokowany!",lvlMax:" 🏆 Maksymalny poziom — mistrzowski bieg!",lvlShort:"Poz.",startBest:"🏆 Rekord w tym układzie: {n} pkt",startBestNone:"Brak gier w tym układzie",modeLbl:"🧩 Tryb",modeClassicLbl:"Klasyczny",modeBarLbl:"Pasek 5",resTabClassic:"🧩 Klasyczny",resTabBar:"🖐 Pasek 5",introWelcome:"Witaj!",changesLbl:"📋 Zmiany",congratsX:"🎉 Gratulacje!",congrats10:"👏 Szczere gratulacje!",congrats3:"🌟 Super gratulacje!",congrats1:"🏆 Mistrzostwo!",winPlaceTxt:"{score} pkt • miejsce {place} z {total}",btnNewGame:"▶ Nowa gra",btnHome:"🏠 Ekran startowy",barFullTitle:"😟 Pasek pełny!",barFullMsg:"Brak miejsca i pary. Tasuj zwolni też kieszeń.",settingsNote:"v4.55: prawdziwy zrzut gry w finale intra (ludzkie dłonie); Witaj!; start nad prawie ostrym lasem; każda budowla ≤6×6 (bez przesuwania); drabinka = 10 poziomów × 3 losowe budowle (30 konstrukcji)."}
 };
-let settings={volume:parseInt(localStorage.getItem('pm_vol')||'70'),musicVolume:parseInt(localStorage.getItem('pm_musicvol')||'25'),soundEnabled:localStorage.getItem('pm_sound')!=='0',vibEnabled:localStorage.getItem('pm_vib')!=='0',animationsEnabled:localStorage.getItem('pm_anim')!=='0',perfMode:'fast',debugIds:localStorage.getItem('pm_debug')==='1',textureSet:localStorage.getItem('pm_textureSet')||'hd36',randomTexture:localStorage.getItem('pm_randomTexture')==='1',badgeIcons:localStorage.getItem('pm_badges')==='1',mode:localStorage.getItem('pm_mode')||'bar5',ambVol:parseInt(localStorage.getItem('pm_ambvol')||'20')};
+let settings={volume:parseInt(localStorage.getItem('pm_vol')||'70'),musicVolume:parseInt(localStorage.getItem('pm_musicvol')||'13'),volEnabled:localStorage.getItem('pm_volen')!=='0',musicEnabled:localStorage.getItem('pm_musen')!=='0',ambEnabled:localStorage.getItem('pm_amben')!=='0',soundEnabled:localStorage.getItem('pm_sound')!=='0',vibEnabled:localStorage.getItem('pm_vib')!=='0',animationsEnabled:localStorage.getItem('pm_anim')!=='0',perfMode:'fast',debugIds:localStorage.getItem('pm_debug')==='1',textureSet:localStorage.getItem('pm_textureSet')||'hd36',randomTexture:localStorage.getItem('pm_randomTexture')==='1',badgeIcons:localStorage.getItem('pm_badges')==='1',mode:localStorage.getItem('pm_mode')||'bar5',ambVol:parseInt(localStorage.getItem('pm_ambvol')||'8')};
 let currentLang=localStorage.getItem('pilematch_lang')||(navigator.language.startsWith('pl')?'pl':'en');
 let testerName=localStorage.getItem('pilematch_tester')||(currentLang==='pl'?'Bogusia':'Guest');
 function t(k,v={}){let s=(I18N[currentLang]&&I18N[currentLang][k])||I18N.en[k]||k;Object.keys(v).forEach(x=>s=s.replaceAll(`{${x}}`,v[x]));return s;}
-function saveSettings(){localStorage.setItem('pm_vol',settings.volume);localStorage.setItem('pm_musicvol',settings.musicVolume);localStorage.setItem('pm_sound',settings.soundEnabled?'1':'0');localStorage.setItem('pm_vib',settings.vibEnabled?'1':'0');localStorage.setItem('pm_anim',settings.animationsEnabled?'1':'0');localStorage.setItem('pm_perf',settings.perfMode);localStorage.setItem('pm_debug',settings.debugIds?'1':'0');localStorage.setItem('pm_textureSet',settings.textureSet);localStorage.setItem('pm_randomTexture',settings.randomTexture?'1':'0');localStorage.setItem('pm_badges',settings.badgeIcons?'1':'0');localStorage.setItem('pm_mode',settings.mode);localStorage.setItem('pm_ambvol',settings.ambVol);applyPerfMode();}
+function saveSettings(){localStorage.setItem('pm_vol',settings.volume);localStorage.setItem('pm_musicvol',settings.musicVolume);localStorage.setItem('pm_sound',settings.soundEnabled?'1':'0');localStorage.setItem('pm_vib',settings.vibEnabled?'1':'0');localStorage.setItem('pm_anim',settings.animationsEnabled?'1':'0');localStorage.setItem('pm_perf',settings.perfMode);localStorage.setItem('pm_debug',settings.debugIds?'1':'0');localStorage.setItem('pm_textureSet',settings.textureSet);localStorage.setItem('pm_randomTexture',settings.randomTexture?'1':'0');localStorage.setItem('pm_badges',settings.badgeIcons?'1':'0');localStorage.setItem('pm_mode',settings.mode);localStorage.setItem('pm_ambvol',settings.ambVol);localStorage.setItem('pm_volen',settings.volEnabled!==false?'1':'0');localStorage.setItem('pm_musen',settings.musicEnabled!==false?'1':'0');localStorage.setItem('pm_amben',settings.ambEnabled!==false?'1':'0');applyPerfMode();}
 function applyPerfMode(){
   document.body.classList.remove('mode-fast','mode-quality');document.body.classList.add('mode-fast');
   // v4.45: same tile size in every mode (senior-friendly — no giant/shrinking blocks when switching modes)
@@ -443,14 +489,15 @@ function applyPerfMode(){
   document.body.classList.toggle('show-badges', !!settings.badgeIcons);
   const bt=document.getElementById('toggle-badges'); if(bt) bt.classList.toggle('on',!!settings.badgeIcons);
   const sel=document.getElementById('texture-select'); if(sel) sel.value=settings.textureSet;
-  syncSetGrid(); syncModeSeg(); fitBar();
+  syncSetGrid(); syncModeSeg(); fitBar(); if(typeof syncVolChecks==='function') syncVolChecks();
 }
 let audioCtx=null;
 function getAudioCtx(){ if(!audioCtx){ try{ audioCtx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return null; } } if(audioCtx.state==='suspended'){ audioCtx.resume(); } return audioCtx; }
 function resumeAudio(){ try{ if(audioCtx && audioCtx.state==='suspended'){ audioCtx.resume().catch(()=>{}); } }catch(e){} }
 ['pointerdown','touchstart','keydown','focus','pageshow'].forEach(ev=> window.addEventListener(ev, resumeAudio, {passive:true}));
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden) resumeAudio(); });
-function beep(freq,dur){ if(!settings.soundEnabled||settings.volume===0) return; try{ const ctx=getAudioCtx(); if(!ctx) return; resumeAudio(); const o=ctx.createOscillator(), g=ctx.createGain(); o.frequency.value=freq; o.type='sine'; o.connect(g); g.connect(ctx.destination); const vol=(settings.volume/100)*0.5; const now=ctx.currentTime; g.gain.setValueAtTime(vol, now); g.gain.exponentialRampToValueAtTime(0.001, now+Math.max(dur,0.05)); o.start(now); o.stop(now+Math.max(dur,0.05)+0.02); o.onended=()=>{ try{o.disconnect();g.disconnect();}catch(e){} }; }catch(e){} }
+function sfxVol(){ return settings.volEnabled===false?0:settings.volume; } // v4.52: volume checkbox gates every effect
+function beep(freq,dur){ if(!settings.soundEnabled||sfxVol()===0) return; try{ const ctx=getAudioCtx(); if(!ctx) return; resumeAudio(); const o=ctx.createOscillator(), g=ctx.createGain(); o.frequency.value=freq; o.type='sine'; o.connect(g); g.connect(ctx.destination); const vol=(sfxVol()/100)*0.5; const now=ctx.currentTime; g.gain.setValueAtTime(vol, now); g.gain.exponentialRampToValueAtTime(0.001, now+Math.max(dur,0.05)); o.start(now); o.stop(now+Math.max(dur,0.05)+0.02); o.onended=()=>{ try{o.disconnect();g.disconnect();}catch(e){} }; }catch(e){} }
 function vib(pattern){ if(!settings.vibEnabled) return; try{ if(window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Haptics){ window.Capacitor.Plugins.Haptics.vibrate({duration: typeof pattern==='number'?pattern:80}); } else if(navigator.vibrate){ navigator.vibrate(pattern); } }catch(e){} }
 // v4.40: fire (streak) bonus plays a random recorded announcer clip — several voices (male+female),
 // never the same clip twice in a row, still throttled; device TTS as last-resort fallback.
@@ -459,7 +506,7 @@ const FIRE_CLIPS={en:['fire-en.mp3'], pl:['fire-pl-1.mp3','fire-pl-2.mp3','fire-
 const fireClipLastIdx={};
 const fireAudioCache={};
 function sayFire(){
-  if(!settings.soundEnabled || settings.volume===0) return;
+  if(!settings.soundEnabled || sfxVol()===0) return;
   const now=Date.now(); if(now-lastFireVoiceAt<8000) return; lastFireVoiceAt=now; // v4.42: half as often
   const lang=(currentLang==='pl')?'pl':'en';
   const pool=FIRE_CLIPS[lang]||FIRE_CLIPS.en;
@@ -472,7 +519,7 @@ function sayFire(){
   try{
     let a=fireAudioCache[path];
     if(!a){ a=new Audio(path); a.preload='auto'; fireAudioCache[path]=a; }
-    a.volume=Math.max(0.05,Math.min(1,settings.volume/100));
+    a.volume=Math.max(0.05,Math.min(1,sfxVol()/100));
     try{ a.currentTime=0; }catch(e){}
     const p=a.play();
     if(p && p.catch) p.catch(()=>sayFireTTS(lang));
@@ -481,11 +528,11 @@ function sayFire(){
 function sayFireTTS(lang){ // last-resort fallback; tuned for natural, non-robotic sound
   try{
     const synth=window.speechSynthesis; if(!synth || typeof SpeechSynthesisUtterance==='undefined') return;
-    const u=new SpeechSynthesisUtterance(lang==='pl'?'Ogień!':'Fire!');
+    const u=new SpeechSynthesisUtterance(lang==='pl'?'Brawo!':'Bravo!');
     u.lang=lang==='pl'?'pl-PL':'en-US';
     u.pitch=0.8; // mildly deep — extreme pitch sounds artificial
     u.rate=0.95;
-    u.volume=Math.max(0.05,Math.min(1,settings.volume/100));
+    u.volume=Math.max(0.05,Math.min(1,sfxVol()/100));
     const vs=synth.getVoices()||[];
     const pick=vs.find(v=>v.lang&&v.lang.toLowerCase().indexOf(lang)===0 && /male/i.test(v.name) && !/female/i.test(v.name))
       ||vs.find(v=>v.lang&&v.lang.toLowerCase().indexOf(lang)===0)
@@ -497,7 +544,7 @@ function sayFireTTS(lang){ // last-resort fallback; tuned for natural, non-robot
 // v4.41: background music for Hold-5 mode — 2 tracks alternate in a loop, fade in on start, fade out on stop
 const MUSIC_TRACKS=['sounds/mahjong_background.mp3','sounds/mahjong2.mp3'];
 let musicAudio=null, musicTrackIdx=-1, musicFadeTimer=null, musicWanted=false;
-function musicTargetVol(){ return Math.max(0,Math.min(1,(settings.musicVolume||0)/100))*0.55; } // v4.42: slider 100% == old 55% loudness
+function musicTargetVol(){ return Math.max(0,Math.min(1,(settings.musicVolume||0)/100))*0.55*(settings.musicEnabled===false?0:1); } // v4.42: slider 100% == old 55% loudness; v4.52 checkbox gate
 function fadeMusicTo(target,ms,after){
   if(!musicAudio){ after&&after(); return; }
   if(musicFadeTimer){ clearInterval(musicFadeTimer); musicFadeTimer=null; }
@@ -531,15 +578,15 @@ function startMusic(crossfade){
   fadeMusicTo(musicTargetVol(), crossfade?1300:2600); // v4.48: gentle ramp-up (was 800 ms — too abrupt)
   startAmbience();
 }
+function stopMusicOnly(){ musicWanted=false; fadeMusicTo(0,900,()=>{ const a=musicAudio; musicAudio=null; if(a){ try{ a.pause(); }catch(e){} } }); } // v4.52: kills music, keeps ambience
 function stopMusic(){
-  musicWanted=false;
-  fadeMusicTo(0,1200,()=>{ const a=musicAudio; musicAudio=null; if(a){ try{ a.pause(); }catch(e){} } });
+  stopMusicOnly();
   stopAmbience();
 }
 // v4.49: real recorded ambience loops (rainfall + woodland birdsong, CC BY-SA — see sounds/CREDITS.md), Hold-5 only
 const AMB_RAIN='sounds/rain-loop.ogg', AMB_BIRDS='sounds/birds-loop.mp3';
 let amb={on:false,rain:null,birds:null};
-function ambTargetVol(){ return Math.max(0,Math.min(1,(settings.ambVol||0)/100))*0.55*0.7; } // v4.49: sits at 70% of the music range
+function ambTargetVol(){ return Math.max(0,Math.min(1,(settings.ambVol||0)/100))*0.55*0.7*(settings.ambEnabled===false?0:1); } // v4.49: sits at 70% of the music range; v4.52 checkbox gate
 function fadeGain(a,target,ms,after){ // tiny per-element fader for the ambience loops
   if(a._ft){ clearInterval(a._ft); a._ft=null; }
   const from=a.volume, steps=Math.max(1,Math.round(ms/60)); let i=0;
@@ -571,7 +618,7 @@ function syncAmbVol(){
 // v4.48: pentatonic match ladder — each cleared pair plays the next soft wooden note, resets after a pause
 const PENTA=[523.25,587.33,659.25,783.99,880.00,1046.50,1174.66,1318.51]; // C D E G A C6 D6 E6
 function chime(){
-  if(!settings.soundEnabled || settings.volume===0) return;
+  if(!settings.soundEnabled || sfxVol()===0) return;
   try{
     const ctx=getAudioCtx(); if(!ctx) return;
     const now=Date.now();
@@ -580,7 +627,7 @@ function chime(){
     const f=PENTA[(state.chimeIdx||0)%PENTA.length];
     state.chimeIdx=(state.chimeIdx||0)+1;
     const t0=ctx.currentTime+0.01;
-    const peak=Math.max(0.05,Math.min(1,settings.volume/100))*0.5;
+    const peak=Math.max(0.05,Math.min(1,sfxVol()/100))*0.5;
     [[f,1],[f*2,0.22],[f*3,0.06]].forEach(([fr,amp])=>{
       const o=ctx.createOscillator(), g=ctx.createGain();
       o.type='sine'; o.frequency.value=fr;
@@ -645,10 +692,13 @@ function makeScatterTiles(){
   }
   return pts;
 }
-// === STRUCTURES-BEGIN v4.51 ===
-// v4.46: hold-5 builds — user-specced compositions. Rules enforced by tests: 44-80
-// tiles, even count, every raised tile physically supported, fully drainable top-down,
-// ground layer fills >=50% of the bounding box (no skinny rails), every shape >=3 wide.
+// === STRUCTURES-BEGIN v4.55 ===
+// v4.46-4.55: hold-5 builds. Tests enforce: 44-80 tiles, even, fully supported,
+// fully drainable top-down, ground fills >=50% of bbox, 3..6 columns wide.
+// v4.55: EVERY build now fits a 6x6 box (max coordinate span 5) so nothing ever
+// needs panning on a phone. The climb is 10 levels, each a pool of 3 builds drawn
+// at random (30 total) — v4.54 favourites rearranged into 6x6 plus new builds.
+// Tiers run easy -> hard by measured Monte-Carlo diffB (tests/analyze-structures.mjs).
 function _structAssert(pts){
   for(;;){
     const ok=pts.filter(p=>{
@@ -662,48 +712,257 @@ function _structAssert(pts){
   return pts;
 }
 function _structRect(P,x0,y0,w,h,z,step=1){ for(let y=0;y<h;y++) for(let x=0;x<w;x++) P.push({x:x0+x*step, y:y0+y*step, z}); }
-function structTwinPyramidField(){ // two side pyramids + flat 1-level middle field — 46 tiles, 3 layers
+
+// ---- pool A: flat & friendly (6x6 meadows) ----
+function structMeadowCaps(){ // open meadow + 8 caps (ex corner towers) — 44 tiles, 2 layers
   const P=[];
-  _structRect(P,0,2,3,3,0);                                                       // left pyramid base
-  P.push({x:0.5,y:2.5,z:1},{x:1.5,y:2.5,z:1},{x:0.5,y:3.5,z:1},{x:1.5,y:3.5,z:1});
-  P.push({x:1,y:3,z:2});
-  _structRect(P,4,2,3,3,0);                                                       // right pyramid base
-  P.push({x:4.5,y:2.5,z:1},{x:5.5,y:2.5,z:1},{x:4.5,y:3.5,z:1},{x:5.5,y:3.5,z:1});
-  P.push({x:5,y:3,z:2});
-  _structRect(P,0,0,7,2,0);                                                       // flat field rows
-  [2,3,4,5].forEach(y=>P.push({x:3,y,z:0}));                                      // middle connector column
+  _structRect(P,0,0,6,6,0);
+  [[0.5,0.5],[4.5,0.5],[0.5,4.5],[4.5,4.5],[2,2],[3,2],[2,3],[3,3]].forEach(c=>P.push({x:c[0],y:c[1],z:1}));
   return _structAssert(P);
 }
-structTwinPyramidField.disp='twin pyramids + flat field'; structTwinPyramidField.diff=0.80; structTwinPyramidField.stars=2;
-function structCornerTowersField(){ // little towers on 4 corners + 1 in the middle, rest 1 level — 46 tiles, 4 layers
+structMeadowCaps.disp='meadow + caps'; structMeadowCaps.pl='łąka z czapkami'; structMeadowCaps.diff=0.80; structMeadowCaps.stars=1;
+function structPicnicBenches(){ // two long offset benches — 46 tiles, 2 layers
   const P=[];
-  _structRect(P,0,0,7,5,0);                                                       // the flat field
-  [[0,0],[6,0],[0,4],[6,4]].forEach(c=>{ P.push({x:c[0],y:c[1],z:1},{x:c[0],y:c[1],z:2}); });
-  P.push({x:3,y:2,z:1},{x:3,y:2,z:2},{x:3,y:2,z:3});                              // the middle tower
+  _structRect(P,0,0,6,6,0);
+  _structRect(P,0.5,1.5,5,1,1); _structRect(P,0.5,3.5,5,1,1);
   return _structAssert(P);
 }
-structCornerTowersField.disp='corner towers + middle tower'; structCornerTowersField.diff=0.80; structCornerTowersField.stars=1;
-function structQuadTowersMound(){ // four zigzag towers + middle mound — 56 tiles, 6 layers
+structPicnicBenches.disp='picnic benches'; structPicnicBenches.pl='ławki piknikowe'; structPicnicBenches.diff=0.80; structPicnicBenches.stars=2;
+function structGardenBeds(){ // four raised 2x2 garden beds — 52 tiles, 2 layers
   const P=[];
-  for(let z=0;z<6;z++){
-    const ox=(z%2)?0.5:0, oy=(z%2)?0.5:0;
-    [[0,0],[2.5,0],[0,4.5],[2.5,4.5]].forEach(c=>{ P.push({x:c[0]+ox,y:c[1]+oy,z}); P.push({x:c[0]+ox+1,y:c[1]+oy,z}); });
+  _structRect(P,0,0,6,6,0);
+  [[0.5,0.5],[3.5,0.5],[0.5,3.5],[3.5,3.5]].forEach(o=>{ _structRect(P,o[0],o[1],2,2,1); });
+  return _structAssert(P);
+}
+structGardenBeds.disp='four garden beds'; structGardenBeds.pl='cztery grządki'; structGardenBeds.diff=0.80; structGardenBeds.stars=2;
+function structTwinMounds(){ // two little mounds on a meadow (ex twin pyramids) — 46 tiles, 3 layers
+  const P=[];
+  _structRect(P,0,0,6,6,0);
+  _structRect(P,0.5,2.5,2,2,1); P.push({x:1,y:3,z:2});
+  _structRect(P,3.5,2.5,2,2,1); P.push({x:4,y:3,z:2});
+  return _structAssert(P);
+}
+structTwinMounds.disp='twin mounds'; structTwinMounds.pl='dwa pagórki'; structTwinMounds.diff=0.80; structTwinMounds.stars=4;
+function structCheckerMini(){ // mini checker bumps + offset crowns — 48 tiles, 3 layers
+  const P=[];
+  _structRect(P,0,0,6,6,0);
+  for(let y=1;y<5;y++) for(let x=1;x<5;x++) if((x+y)%2===0) P.push({x,y,z:1});
+  [[1.5,2.5],[3.5,1.5],[2.5,3.5],[4.5,2.5]].forEach(c=>P.push({x:c[0],y:c[1],z:2}));
+  return _structAssert(P);
+}
+structCheckerMini.disp='mini checker + caps'; structCheckerMini.pl='mini szachownica'; structCheckerMini.diff=0.80; structCheckerMini.stars=2;
+function structDonutMini(){ // mini ring around an open courtyard (ex donut) — 48 tiles, 3 layers
+  const P=[];
+  for(let y=0;y<6;y++) for(let x=0;x<6;x++){ if(x>=2&&x<=3&&y>=2&&y<=3) continue; P.push({x,y,z:0}); }
+  _structRect(P,1,1,4,1,1); _structRect(P,1,4,4,1,1);
+  [[1,2],[1,3],[4,2],[4,3]].forEach(c=>P.push({x:c[0],y:c[1],z:1}));
+  [[1,1],[4,1],[1,4],[4,4]].forEach(c=>P.push({x:c[0],y:c[1],z:2}));
+  return _structAssert(P);
+}
+structDonutMini.disp='mini donut ring'; structDonutMini.pl='mini obręcz'; structDonutMini.diff=0.80; structDonutMini.stars=1;
+function structTwinRails(){ // two full-length offset rails + ties — 52 tiles, 3 layers
+  const P=[];
+  _structRect(P,0,0,6,6,0);
+  _structRect(P,1.5,0,1,6,1); _structRect(P,3.5,0,1,6,1);
+  [[1.5,1],[3.5,1],[1.5,4],[3.5,4]].forEach(c=>P.push({x:c[0],y:c[1],z:2}));
+  return _structAssert(P);
+}
+structTwinRails.disp='twin rails'; structTwinRails.pl='podwójne tory'; structTwinRails.diff=0.80; structTwinRails.stars=2;
+// ---- pool B: raised bands & walls ----
+function structTerracesMicro(){ // micro staggered terraces (ex three steps) — 66 tiles, 3 layers
+  const P=[];
+  _structRect(P,0,0,6,6,0);
+  _structRect(P,3,0,3,6,1);
+  _structRect(P,4,0,2,6,2);
+  return _structAssert(P);
+}
+structTerracesMicro.disp='micro terraces'; structTerracesMicro.pl='mikro tarasy'; structTerracesMicro.diff=0.80; structTerracesMicro.stars=1;
+function structBridgesMicro(){ // two full bridges + keystones (ex bridges/viaduct) — 50 tiles, 3 layers
+  const P=[];
+  _structRect(P,0,0,6,6,0);
+  _structRect(P,0,1,6,1,1);
+  _structRect(P,0,4,6,1,1);
+  P.push({x:2.5,y:1,z:2},{x:2.5,y:4,z:2});
+  return _structAssert(P);
+}
+structBridgesMicro.disp='micro bridges'; structBridgesMicro.pl='mikro mosty'; structBridgesMicro.diff=0.80; structBridgesMicro.stars=1;
+function structWindmillMini(){ // mini windmill + raised hub — 48 tiles, 3 layers
+  const P=[];
+  _structRect(P,0,0,6,6,0);
+  [[1,1],[4,1],[1,4],[4,4],[2,2],[3,2],[2,3],[3,3]].forEach(c=>P.push({x:c[0],y:c[1],z:1}));
+  [[2.5,2.5],[3.5,2.5],[2.5,3.5],[3.5,3.5]].forEach(c=>P.push({x:c[0],y:c[1],z:2}));
+  return _structAssert(P);
+}
+structWindmillMini.disp='mini windmill'; structWindmillMini.pl='mini wiatrak'; structWindmillMini.diff=0.80; structWindmillMini.stars=3;
+function structCanyonMini(){ // mini canyon walls (ex canyon) — 60 tiles, 4 layers
+  const P=[];
+  _structRect(P,0,0,6,6,0);
+  for(let y=0;y<6;y++){ P.push({x:0,y,z:1},{x:5,y,z:1}); }
+  for(let y=1;y<5;y++){ P.push({x:0,y,z:2},{x:5,y,z:2}); }
+  [[0,2],[0,3],[5,2],[5,3]].forEach(c=>P.push({x:c[0],y:c[1],z:3}));
+  return _structAssert(P);
+}
+structCanyonMini.disp='mini canyon'; structCanyonMini.pl='mini kanion'; structCanyonMini.diff=0.80; structCanyonMini.stars=2;
+function structZigzagPosts(){ // six zigzag posts (ex nine towers) — 48 tiles, 3 layers
+  const P=[];
+  _structRect(P,0,0,6,6,0);
+  [1.5,3.5].forEach(x=>[0.5,2.5,4.5].forEach(y=>P.push({x,y,z:1})));
+  [[2,1],[4,1],[2,3],[4,3],[2,5],[4,5]].forEach(c=>P.push({x:c[0],y:c[1],z:2}));
+  return _structAssert(P);
+}
+structZigzagPosts.disp='zigzag posts'; structZigzagPosts.pl='słupki zygzak'; structZigzagPosts.diff=0.80; structZigzagPosts.stars=3;
+function structCrownTable(){ // solid table with an offset crown (ex crown steps) — 58 tiles, 4 layers
+  const P=[];
+  _structRect(P,0,0,6,6,0);
+  _structRect(P,1,1,4,4,1);
+  _structRect(P,2,2,2,2,2);
+  P.push({x:2.5,y:2.5,z:3},{x:3.5,y:3.5,z:3});
+  return _structAssert(P);
+}
+structCrownTable.disp='crown table'; structCrownTable.pl='stół z koroną'; structCrownTable.diff=0.80; structCrownTable.stars=3;
+function structCourtyardWalls(){ // offset rim walls around an open court — 48 tiles, 2 layers
+  const P=[];
+  for(let y=0;y<6;y++) for(let x=0;x<6;x++){ if(x>=2&&x<=3&&y>=2&&y<=3) continue; P.push({x,y,z:0}); }
+  _structRect(P,0.5,0.5,5,1,1); _structRect(P,0.5,4.5,5,1,1);
+  _structRect(P,0.5,1.5,1,3,1); _structRect(P,4.5,1.5,1,3,1);
+  return _structAssert(P);
+}
+structCourtyardWalls.disp='courtyard walls'; structCourtyardWalls.pl='mury dziedzińca'; structCourtyardWalls.diff=0.80; structCourtyardWalls.stars=2;
+function structHoneycomb(){ // honeycomb half-cover — 54 tiles, 2 layers
+  const P=[];
+  _structRect(P,0,0,6,6,0);
+  for(let y=0;y<6;y++) for(let x=0;x<6;x++) if((x+y)%2===0) P.push({x,y,z:1});
+  return _structAssert(P);
+}
+structHoneycomb.disp='honeycomb'; structHoneycomb.pl='plaster miodu'; structHoneycomb.diff=0.80; structHoneycomb.stars=1;
+// ---- pool C: stacked middles ----
+function structConcentric(){ // concentric rings, offset ring layer — 68 tiles, 4 layers (v4.54 classic, already 6x6)
+  const P=[];
+  _structRect(P,0,0,6,6,0);
+  _structRect(P,1,1,4,4,1);
+  [[1.5,1.5],[2.5,1.5],[3.5,1.5],[4.5,1.5],[1.5,4.5],[2.5,4.5],[3.5,4.5],[4.5,4.5],[1.5,2.5],[1.5,3.5],[4.5,2.5],[4.5,3.5]].forEach(c=>P.push({x:c[0],y:c[1],z:2}));
+  [[1.5,1.5],[4.5,1.5],[1.5,4.5],[4.5,4.5]].forEach(c=>P.push({x:c[0],y:c[1],z:3}));
+  return _structAssert(P);
+}
+structConcentric.disp='concentric offset rings'; structConcentric.pl='pierścienie'; structConcentric.diff=0.82; structConcentric.stars=4;
+function structFourTowers(){ // four corner towers + offset caps (ex quad towers) — 68 tiles, 4 layers
+  const P=[];
+  _structRect(P,0,0,6,6,0);
+  [[0,0],[4,0],[0,4],[4,4]].forEach(o=>{ _structRect(P,o[0],o[1],2,2,1); _structRect(P,o[0],o[1],2,2,2); });
+  [[0.5,0.5],[4.5,0.5],[0.5,4.5],[4.5,4.5]].forEach(c=>P.push({x:c[0],y:c[1],z:3}));
+  return _structAssert(P);
+}
+structFourTowers.disp='four towers + caps'; structFourTowers.pl='cztery wieże'; structFourTowers.diff=0.80; structFourTowers.stars=4;
+function structVolcano(){ // crater ring around a hole — 48 tiles, 3 layers
+  const P=[];
+  for(let y=0;y<6;y++) for(let x=0;x<6;x++){ if(x>=2&&x<=3&&y>=2&&y<=3) continue; P.push({x,y,z:0}); }
+  [[1.5,1.5],[2.5,1.5],[3.5,1.5],[4.5,1.5],[1.5,4.5],[2.5,4.5],[3.5,4.5],[4.5,4.5],[1.5,2.5],[1.5,3.5],[4.5,2.5],[4.5,3.5]].forEach(c=>P.push({x:c[0],y:c[1],z:1}));
+  [[1.5,1.5],[4.5,1.5],[1.5,4.5],[4.5,4.5]].forEach(c=>P.push({x:c[0],y:c[1],z:2}));
+  return _structAssert(P);
+}
+structVolcano.disp='volcano'; structVolcano.pl='wulkan'; structVolcano.diff=0.80; structVolcano.stars=3;
+function structMiniKeep(){ // offset-floor mini castle keep (ex keep) — 54 tiles, 4 layers
+  const P=[];
+  _structRect(P,0,0,4,5,0);
+  _structRect(P,0.5,0.5,4,5,1);
+  _structRect(P,0,1,4,3,2);
+  P.push({x:0.5,y:0.5,z:3},{x:3.5,y:3.5,z:3});
+  return _structAssert(P);
+}
+structMiniKeep.disp='mini keep'; structMiniKeep.pl='mini donżon'; structMiniKeep.diff=1.25; structMiniKeep.stars=5;
+function structChimneysMini(){ // two tall chimneys, capped (ex twin chimneys) — 62 tiles, 5 layers
+  const P=[];
+  _structRect(P,0,0,6,6,0);
+  for(let z=1;z<4;z++){
+    [[0,1],[1,1],[0,2],[1,2],[4,3],[5,3],[4,4],[5,4]].forEach(c=>P.push({x:c[0],y:c[1],z}));
   }
-  _structRect(P,0.5,2,3,2,0);                                                     // middle plateau
-  P.push({x:1,y:2.5,z:1},{x:2,y:2.5,z:1});                                        // mound top
+  P.push({x:0.5,y:1.5,z:4},{x:4.5,y:3.5,z:4});
   return _structAssert(P);
 }
-structQuadTowersMound.disp='quad towers + middle mound'; structQuadTowersMound.diff=1.25; structQuadTowersMound.stars=5;
-function structRidgeWide(){ // vertical ridge + side wings; low at both ends, tallest mid — 62 tiles, 5 layers
+structChimneysMini.disp='twin chimneys mini'; structChimneysMini.pl='dwa kominiki'; structChimneysMini.diff=0.94; structChimneysMini.stars=4;
+function structTwinPagodas(){ // two offset-floor pagodas — 54 tiles, 4 layers
   const P=[];
-  const hs=[1,2,3,4,5,4,3,2,1];
-  hs.forEach((h,y)=>{ for(let z=0;z<h;z++){ P.push({x:0.7,y,z}); P.push({x:1.7,y,z}); } });
-  [2,3,4,5,6].forEach(y=>{ P.push({x:0,y,z:0}); P.push({x:2.4,y,z:0}); });        // side levels
-  P.push({x:0,y:4,z:1},{x:2.4,y:4,z:1});
+  _structRect(P,0,0,6,6,0);
+  _structRect(P,0,1,2,2,1); _structRect(P,0.5,1.5,2,2,2); P.push({x:1,y:2,z:3});
+  _structRect(P,4,3,2,2,1); _structRect(P,3.5,3.5,2,2,2); P.push({x:4,y:4,z:3});
   return _structAssert(P);
 }
-structRidgeWide.disp='wide vertical ridge'; structRidgeWide.diff=0.80; structRidgeWide.stars=3;
-function structSkyscraperCity(){ // 3-column high-rise, narrows every two floors — 50 tiles, 6 layers
+structTwinPagodas.disp='twin pagodas'; structTwinPagodas.pl='bliźniacze pagody'; structTwinPagodas.diff=1.10; structTwinPagodas.stars=5;
+function structGreatWallMicro(){ // micro zigzag ridge + side wings (ex great wall) — 44 tiles, 4 layers
+  const P=[];
+  const hs=[2,3,4,4,3,2];
+  hs.forEach((h,y)=>{ for(let z=0;z<h;z++){ const ox=(z%2)?0.5:0; P.push({x:1+ox,y,z}); P.push({x:2+ox,y,z}); } });
+  [1,2,3,4].forEach(y=>{ P.push({x:0,y,z:0}); P.push({x:3,y,z:0}); });
+  return _structAssert(P);
+}
+structGreatWallMicro.disp='great wall micro'; structGreatWallMicro.pl='mikro wielki mur'; structGreatWallMicro.diff=0.83; structGreatWallMicro.stars=4;
+// ---- pool D: the mountains ----
+function structPagodaPlate(){ // big offset pagoda plate (ex pagoda tower/steps) — 72 tiles, 4 layers
+  const P=[];
+  _structRect(P,0,0,6,6,0);
+  _structRect(P,1,1,4,4,1);
+  _structRect(P,1.5,1.5,4,4,2);
+  [[2.5,2.5],[3.5,2.5],[2.5,3.5],[3.5,3.5]].forEach(c=>P.push({x:c[0],y:c[1],z:3}));
+  return _structAssert(P);
+}
+structPagodaPlate.disp='pagoda plate'; structPagodaPlate.pl='płyta pagody'; structPagodaPlate.diff=1.00; structPagodaPlate.stars=4;
+function structZigguratMicro(){ // micro stepped pyramid, offset floors — 58 tiles, 4 layers
+  const P=[];
+  _structRect(P,0,0,6,5,0);
+  _structRect(P,0.5,0.5,5,4,1);
+  _structRect(P,1.5,1.5,3,2,2);
+  P.push({x:2,y:2,z:3},{x:3,y:2,z:3});
+  return _structAssert(P);
+}
+structZigguratMicro.disp='micro ziggurat'; structZigguratMicro.pl='mikro ziggurat'; structZigguratMicro.diff=1.09; structZigguratMicro.stars=5;
+function structCrushPlate(){ // whole meadow pressed under an offset plate — 62 tiles, 3 layers
+  const P=[];
+  _structRect(P,0,0,6,6,0);
+  _structRect(P,0.5,0.5,5,5,1);
+  P.push({x:2.5,y:2.5,z:2});
+  return _structAssert(P);
+}
+structCrushPlate.disp='crush plate'; structCrushPlate.pl='prasowana płyta'; structCrushPlate.diff=0.80; structCrushPlate.stars=3;
+function structSenderTower(){ // slim 5x5 tower with a mast — 60 tiles, 4 layers
+  const P=[];
+  _structRect(P,0,0,5,5,0);
+  _structRect(P,0,0,5,5,1);
+  _structRect(P,1,1,3,3,2);
+  P.push({x:2,y:2,z:3});
+  return _structAssert(P);
+}
+structSenderTower.disp='sender tower'; structSenderTower.pl='wieża nadawcza'; structSenderTower.diff=0.80; structSenderTower.stars=1;
+function structFourKeeps(){ // four keeps + middle mound, 4 layers of cover — 76 tiles
+  const P=[];
+  [[0,0],[4,0],[0,4],[4,4]].forEach(o=>{ for(let z=0;z<4;z++) _structRect(P,o[0],o[1],2,2,z); });
+  _structRect(P,2,2,2,2,0); _structRect(P,2,2,2,2,1); _structRect(P,2,2,2,2,2);
+  return _structAssert(P);
+}
+structFourKeeps.disp='four keeps + mound'; structFourKeeps.pl='cztery donżony'; structFourKeeps.diff=0.80; structFourKeeps.stars=3;
+function structDeepSpire(){ // deep offset spire, only 2 free tops — 58 tiles, 6 layers
+  const P=[];
+  _structRect(P,1,1,4,4,0);
+  _structRect(P,1.5,1.5,4,4,1);
+  _structRect(P,1,1,4,4,2);
+  _structRect(P,2,2,2,2,3);
+  _structRect(P,2.5,2.5,2,2,4);
+  P.push({x:2.5,y:2.5,z:5},{x:3.5,y:3.5,z:5});
+  return _structAssert(P);
+}
+structDeepSpire.disp='deep spire'; structDeepSpire.pl='głęboka iglica'; structDeepSpire.diff=1.25; structDeepSpire.stars=5;
+function structBellTower(){ // narrow high keep, floors alternate offset — 54 tiles, 7 layers (v4.54 classic, already 6x6)
+  const P=[];
+  _structRect(P,0,0,4,4,0);
+  _structRect(P,0,0,3,3,1);
+  _structRect(P,0.5,0.5,3,3,2);
+  _structRect(P,0,0.5,3,2,3);
+  _structRect(P,0.5,1,3,2,4);
+  _structRect(P,1,1,2,2,5);
+  _structRect(P,1.5,1.5,2,2,6);
+  return _structAssert(P);
+}
+structBellTower.disp='narrow bell tower'; structBellTower.pl='wysoka wieża'; structBellTower.diff=1.25; structBellTower.stars=5;
+function structSkyscraperCity(){ // 3-column high-rise, narrows every two floors — 50 tiles, 6 layers (v4.54 classic, already 6x6)
   const P=[];
   _structRect(P,0,0,3,4,0);
   _structRect(P,0.5,0.5,3,4,1);
@@ -713,30 +972,102 @@ function structSkyscraperCity(){ // 3-column high-rise, narrows every two floors
   _structRect(P,1,2,2,2,5);
   return _structAssert(P);
 }
-structSkyscraperCity.disp='3-column skyscraper'; structSkyscraperCity.diff=1.25; structSkyscraperCity.stars=5;
-function structCastleKeepWide(){ // portrait castle keep with 3-wide walls — 48 tiles, 4 layers
-  const P=[];
-  _structRect(P,0,0,3,6,0);
-  _structRect(P,0.5,0.5,3,5,1);
-  _structRect(P,0,1,3,4,2);
-  P.push({x:0.5,y:0.5,z:3},{x:2.5,y:0.5,z:3},{x:1.5,y:3,z:3});                  // merlons
-  return _structAssert(P);
-}
-structCastleKeepWide.disp='castle keep (3-wide)'; structCastleKeepWide.diff=0.92; structCastleKeepWide.stars=4;
-const STRUCTURE_GENS=[structTwinPyramidField,structCornerTowersField,structQuadTowersMound,structRidgeWide,structSkyscraperCity,structCastleKeepWide];
+structSkyscraperCity.disp='3-column skyscraper'; structSkyscraperCity.pl='drapacz chmur'; structSkyscraperCity.diff=1.25; structSkyscraperCity.stars=5;
+
+// v4.55: the climb = 10 levels, each a pool of 3 builds (random draw per deal).
+// Pools are easy -> hard by measured Monte-Carlo diffB (400 deals, seed 42).
+const LEVEL_POOLS=[
+  [structHoneycomb,structDonutMini,structBridgesMicro],       // avg diffB .026
+  [structMeadowCaps,structTerracesMicro,structSenderTower],  // .027
+  [structCanyonMini,structTwinRails,structGardenBeds],       // .029
+  [structPicnicBenches,structCourtyardWalls,structCheckerMini], // .031
+  [structWindmillMini,structFourKeeps,structCrownTable],     // .036
+  [structCrushPlate,structVolcano,structZigzagPosts],        // .039
+  [structFourTowers,structTwinMounds,structConcentric],      // .049
+  [structGreatWallMicro,structChimneysMini,structPagodaPlate], // .061
+  [structZigguratMicro,structTwinPagodas,structMiniKeep],    // .084
+  [structDeepSpire,structSkyscraperCity,structBellTower]     // .280
+];
+// per-tier stars + scoring weight, baked from measured tier-avg diffB
+const LEVEL_META=[{stars:1,weight:0.80},{stars:1,weight:0.80},{stars:2,weight:0.80},{stars:2,weight:0.80},{stars:3,weight:0.80},{stars:3,weight:0.80},{stars:4,weight:0.80},{stars:4,weight:0.92},{stars:5,weight:1.25},{stars:5,weight:1.25}];
+const STRUCTURE_GENS=LEVEL_POOLS.reduce((a,p)=>a.concat(p),[]); // flat pool (classic picks randomly)
 function makeStructureTiles(){
-  const g=STRUCTURE_GENS[Math.floor(Math.random()*STRUCTURE_GENS.length)];
-  state.structureName=g.disp||g.name;
-  state.diffWeight=g.diff||1; state.structStars=g.stars||3; // v4.51: measured structure difficulty
+  let g;
+  if(settings.mode==='bar5' && typeof getBarLevel==='function'){
+    const lvl=Math.max(1,Math.min(LEVEL_POOLS.length,getBarLevel()));
+    const pool=LEVEL_POOLS[lvl-1];
+    g=pool[Math.floor(Math.random()*pool.length)]; // v4.55: >=3 builds per level, drawn at random
+    state.structLevel=lvl;
+    const meta=LEVEL_META[lvl-1]||{};
+    state.diffWeight=meta.weight||1; state.structStars=meta.stars||3;
+  } else {
+    g=STRUCTURE_GENS[Math.floor(Math.random()*STRUCTURE_GENS.length)];
+    state.diffWeight=g.diff||1; state.structStars=g.stars||3;
+  }
+  state.structureName=(typeof structureDisp==='function')?structureDisp(g):(g.disp||g.name);
   return g();
 }
 // === STRUCTURES-END ===
+// --- v4.52 Hold-5 level climb: beat the highest unlocked level to unlock the next ---
+function structureDisp(g){ return (currentLang==='pl' && g.pl) ? g.pl : (g.disp||g.name); }
+const LVL_TOTAL=LEVEL_POOLS.length; // v4.55: 10 levels, each a pool of 3 random builds
+let h5level=(function(){ try{ const v=Math.max(1,Math.min(LVL_TOTAL,parseInt(localStorage.getItem('pm_h5level')||'1'))); return isNaN(v)?1:v; }catch(e){ return 1; } })();
+let barLevelSel=(function(){ try{ const v=parseInt(localStorage.getItem('pm_h5sel')||String(h5level)); return (isNaN(v)?h5level:Math.max(1,Math.min(h5level,v))); }catch(e){ return h5level; } })();
+function getBarLevel(){ return Math.max(1,Math.min(LVL_TOTAL,barLevelSel||1)); }
+function saveBarSel(){ try{ localStorage.setItem('pm_h5sel',String(barLevelSel)); }catch(e){} }
+function updateStartLevelLine(){
+  const el=document.getElementById('start-level-line'); if(!el) return;
+  if(settings.mode!=='bar5'){ el.style.display='none'; el.innerHTML=''; return; }
+  el.style.display='flex';
+  const lvl=getBarLevel();
+  const meta=(LEVEL_META&&LEVEL_META[lvl-1])||{};
+  const st=meta.stars||3, stars=('★'.repeat(st)) + ('☆'.repeat(5-st));
+  const pn=(LEVEL_POOLS&&LEVEL_POOLS[lvl-1])?LEVEL_POOLS[lvl-1].length:1;
+  el.innerHTML='<button class="lvbtn" id="lv-prev"'+(lvl<=1?' disabled':'')+'>◀</button>'
+    +'<span>'+t('levelLbl',{n:lvl})+' / '+LVL_TOTAL+' • '+stars+' • 🎲×'+pn+'</span>'
+    +'<button class="lvbtn" id="lv-next"'+(lvl>=h5level?' disabled':'')+'>▶</button>';
+  const pv=document.getElementById('lv-prev'), nx=document.getElementById('lv-next');
+  if(pv) pv.onclick=()=>{ if(barLevelSel>1){ barLevelSel--; saveBarSel(); updateStartLevelLine(); if(typeof updateFootStats==='function') updateFootStats(); beep(460,0.05); } };
+  if(nx) nx.onclick=()=>{ if(barLevelSel<h5level){ barLevelSel++; saveBarSel(); updateStartLevelLine(); if(typeof updateFootStats==='function') updateFootStats(); beep(520,0.05); } };
+}
+function updateFootStats(){
+  const fs2=document.getElementById('fs-row2'); if(!fs2) return;
+  if(settings.mode==='bar5'){
+    fs2.style.display='flex';
+    const lvl=state.structLevel||getBarLevel();
+    const meta=(LEVEL_META&&LEVEL_META[Math.max(0,Math.min(LVL_TOTAL-1,lvl-1))])||{};
+    const st=meta.stars||3;
+    const fl=document.getElementById('flevel'); if(fl) fl.textContent=t('lvlShort')+' '+lvl;
+    const fs=document.getElementById('fstars'); if(fs) fs.textContent=('★'.repeat(st))+('☆'.repeat(5-st));
+  } else fs2.style.display='none';
+}
+// --- v4.53 intro: grandma on the couch, camera dives into her phone (tap to skip) ---
+function playIntro(){
+  const ov=document.getElementById('intro-overlay');
+  if(!ov){ document.getElementById('start-overlay').classList.add('show'); return; }
+  const f1=ov.querySelector('.fr1'), f2=ov.querySelector('.fr2'), f3=ov.querySelector('.fr3'), tx=document.getElementById('intro-text');
+  tx.textContent=t('introWelcome');
+  ov.classList.add('show'); f1.classList.add('vis');
+  let ended=false;
+  const showStart=()=>document.getElementById('start-overlay').classList.add('show');
+  const t1=setTimeout(()=>f2.classList.add('vis'),1150);
+  const t2=setTimeout(()=>f3.classList.add('vis'),2100);
+  const t3=setTimeout(()=>tx.classList.add('vis'),2950);
+  const t4=setTimeout(()=>end(),3850);
+  function end(){
+    if(ended) return; ended=true;
+    [t1,t2,t3,t4].forEach(clearTimeout);
+    ov.removeEventListener('pointerdown',end);
+    ov.classList.add('out');
+    setTimeout(()=>{ ov.classList.remove('show','out'); [f1,f2,f3].forEach(f=>f.classList.remove('vis')); tx.classList.remove('vis'); showStart(); },300);
+  }
+  ov.addEventListener('pointerdown',end);
+}
 let state={layoutKey:'senior',tiles:[],selected:null,moves:0,startTime:0,timerId:null,history:[],pairsLeft:0,freeCache:[],score:0,lastMatchAt:0,streak:0,shuffles:0,undos:0,totalTiles:0,gameId:0};
 const boardEl=document.getElementById('board');
 const boardWrap=document.getElementById('board-wrap');
 const timerEl=document.getElementById('timer');
 const pairsEl=document.getElementById('pairs');
-const movesEl=document.getElementById('moves');
 let view={fitScale:1,userScale:1,panX:0,panY:0,baseW:800,baseH:600,fitPanX:0,fitPanY:0};
 function computeBase(){
   let maxX=0,maxY=0,maxZ=0;
@@ -758,18 +1089,24 @@ function applyTransform(){
   if(isZoomed){ btn.classList.add('needs-reset'); }
   else { btn.classList.remove('needs-reset'); btn.classList.remove('pulse-attention'); }
 }
+function boardTopInset(){ // v4.54: the area the floating bar owns — the pile must never slide under it
+  if(settings.mode!=='bar5') return 0;
+  const hb=document.getElementById('hold-bar-inner'); if(!hb) return 0;
+  try{ return Math.max(0,hb.getBoundingClientRect().bottom - boardWrap.getBoundingClientRect().top + 8); }catch(e){ return 0; }
+}
 function fitAndCenter(){
   computeBase();
   const pad=6;
   const availW=boardWrap.clientWidth - pad*2;
-  const availH=boardWrap.clientHeight - pad*2;
+  const ti=boardTopInset();
+  const availH=boardWrap.clientHeight - pad*2 - ti;
   const factor=0.98;
   let fs=Math.min(availW/view.baseW, availH/view.baseH)*factor;
-  // v4.46: in Hold-5 never scale tiles UP beyond their natural Classic size — auto-zoom only ever shrinks
-  fs=Math.max(0.28, Math.min(fs, settings.mode==='bar5'?1:1.8));
+  // v4.46: in Hold-5 never scale tiles UP beyond natural size; v4.54: never smaller than the bar pockets (0.762) — pan instead
+  fs=Math.max(settings.mode==='bar5'?0.762:0.28, Math.min(fs, settings.mode==='bar5'?1:1.8));
   view.fitScale=fs; view.userScale=1;
   view.panX = (boardWrap.clientWidth - view.baseW*fs)/2;
-  view.panY = (boardWrap.clientHeight - view.baseH*fs)/2;
+  view.panY = ti + (boardWrap.clientHeight - ti - view.baseH*fs)/2;
   view.fitPanX=view.panX; view.fitPanY=view.panY;
   applyTransform(); showHint(true);
 }
@@ -778,8 +1115,10 @@ function clampPan(){
   const cw=view.baseW*tot, ch=view.baseH*tot;
   if(cw <= boardWrap.clientWidth + 1){ view.panX=(boardWrap.clientWidth - cw)/2; }
   else { view.panX=Math.max(boardWrap.clientWidth - cw - 6, Math.min(6, view.panX)); }
-  if(ch <= boardWrap.clientHeight + 1){ view.panY=(boardWrap.clientHeight - ch)/2; }
-  else { view.panY=Math.max(boardWrap.clientHeight - ch - 6, Math.min(6, view.panY)); }
+  const ti=(typeof boardTopInset==='function')?boardTopInset():0; // v4.54: keep the pile clear of the bar
+  const avH=boardWrap.clientHeight - ti;
+  if(ch <= avH + 1){ view.panY=ti+(avH - ch)/2; }
+  else { view.panY=Math.max(boardWrap.clientHeight - ch - 6, Math.min(ti+4, view.panY)); }
 }
 function showHint(auto=false){
   const el=document.getElementById('zoom-hint'); el.textContent=t('zoomHint'); el.classList.add('show');
@@ -866,7 +1205,6 @@ function updateVisuals(){
     el.classList.toggle('selected', state.selected===tile);
   });
   pairsEl.textContent=t('pairs',{n:state.pairsLeft});
-  movesEl.textContent=t('moves',{n:state.moves});
 }
 function shuffleArr(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a;}
 function checkNoMoves(){ scheduleNoMovesCheck(50); return false; }
@@ -891,7 +1229,7 @@ function showStuck(){
   beep(170,0.18); vib([40,60,40]);
 }
 function genGame(k=state.layoutKey){
-  if(settings.mode==='bar5') startMusic(); else stopMusic(); // v4.41: background music only in Hold-5
+  if(settings.mode==='bar5'){ startMusic(); startAmbience(); } else stopMusic(); // v4.41: music + ambience only in Hold-5; v4.52: each gated by its own checkbox (start fns return early at target vol 0)
   state.gameId=(state.gameId||0)+1;
   if(settings.randomTexture){
     const sets=['hd36','food','geometric','minecraft','foodblock','geoblock','mcblock','mine13','mine14','riichi','riichidark','default','def2','def3'];
@@ -906,7 +1244,7 @@ function genGame(k=state.layoutKey){
   }
   if(settings.mode==='bar5') k='scatter'; else if(k==='scatter') k='senior';
   state.layoutKey=k; try{ localStorage.setItem('pm_layout',k); }catch(e){}
-  state.diffWeight=1; state.structStars=0; // v4.51: flat layouts have no difficulty weight
+  state.diffWeight=1; state.structStars=0; state.structLevel=0; // v4.51/v4.52: flat layouts have no difficulty weight or level
   const layout=LAYOUTS[k];
   let pos=(k==='scatter'||!layout) ? makeStructureTiles() : [...layout.tiles]; if(pos.length%2===1) pos.pop(); // v4.43: structured builds for Hold-5
   const cnt=pos.length; const need4=Math.floor(cnt/4); const rem=cnt%4;
@@ -923,11 +1261,12 @@ function genGame(k=state.layoutKey){
   const countPairsLocal=()=>{ computeFreeCache(); const free=state.tiles.filter((t,i)=> state.freeCache[i]); const m={}; free.forEach(t=>{ const k=pairKey(t.typeId); m[k]=(m[k]||0)+1; }); let pairs=0; for(let kk in m) pairs+=Math.floor(m[kk]/2); return pairs; };
   computeFreeCache(); let pairs=countPairsLocal(); let att=0;
   while(pairs===0 && att<40){ shuffleArr(pool); state.tiles.forEach((t,i)=> t.typeId=pool[i]); computeFreeCache(); pairs=countPairsLocal(); att++; }
-  state.selected=null; state.moves=0; state.history=[]; state.startTime=Date.now(); startTimer(); state.pairsLeft=cnt/2; state.score=0; state.lastMatchAt=0; state.streak=0; state.shuffles=0; state.undos=0; state.chimeIdx=0; state.lastChimeAt=0; state.totalTiles=cnt; setScore(0,false); barReset();
+  state.selected=null; state.moves=0; state.history=[]; state.startTime=Date.now(); startTimer(); state.pairsLeft=cnt/2; state.score=0; state.lastMatchAt=0; state.streak=0; state.shuffles=0; state.undos=0; state.chimeIdx=0; state.lastChimeAt=0; state.totalTiles=cnt; setScore(0,false); barReset(); if(typeof dropDragGhost==='function') dropDragGhost(); if(typeof highlightBarSlot==='function') highlightBarSlot(-1);
   document.getElementById('tester-input').style.display='none';
   createDOM(); computeFreeCache(); updateVisuals();
   requestAnimationFrame(()=>{ fitAndCenter(); setTimeout(fitAndCenter, 120); });
-  const dsel=document.getElementById('debug-structure'); if(dsel){ const show=settings.debugIds && settings.mode==='bar5'; dsel.style.display=show?'block':'none'; if(show) dsel.textContent='🏗 '+(state.structureName||'?')+' • '+cnt+' tiles'+(state.structStars?' • '+'★'.repeat(state.structStars)+'☆'.repeat(5-state.structStars):''); }
+  if(typeof updateFootStats==='function') updateFootStats();
+  const dsel=document.getElementById('debug-structure'); if(dsel){ const show=settings.debugIds && settings.mode==='bar5'; dsel.style.display=show?'block':'none'; if(show) dsel.textContent='🏗 Lv '+(state.structLevel||'?')+' '+(state.structureName||'?')+' • '+cnt+' tiles'+(state.structStars?' • '+'★'.repeat(state.structStars)+'☆'.repeat(5-state.structStars):''); }
 }
 function countPairs(){ const free=state.tiles.filter((t,i)=> !t.removed && state.freeCache[i]); const m={}; free.forEach(t=>{ const k=pairKey(t.typeId); m[k]=(m[k]||0)+1; }); let p=0; for(let k in m) p+=Math.floor(m[k]/2); return p; }
 function createBubblesForTile(tile){
@@ -1003,7 +1342,7 @@ function spawnScoreFx(text,sx,sy,positive,bonus){
     const tx=br.left+br.width/2, ty=br.top+br.height/2;
     const fx=document.createElement('div');
     fx.className='score-fx '+(positive?'plus':'minus')+(bonus?' bonus':'');
-    fx.innerHTML='<span class="fxnum">'+text+'</span>'+(bonus?'<span class="fxico">🔥</span>':'');
+    fx.innerHTML='<span class="fxnum">'+text+'</span>'+(bonus?'<span class="fxico">👏</span>':'');
     document.body.appendChild(fx);
     const fw=fx.offsetWidth||70, fh=fx.offsetHeight||30;
     // keep chips fully on screen
@@ -1078,16 +1417,15 @@ function renderBar(){
 }
 function fitBar(){
   try{
-    const hb=document.getElementById('hold-bar'), inner=document.getElementById('hold-bar-inner');
-    if(!hb||!inner) return;
+    const inner=document.getElementById('hold-bar-inner');
+    if(!inner) return;
     inner.style.transform='scale(1)';
     const need=inner.offsetWidth||1;
     const avail=Math.min(window.innerWidth,document.documentElement.clientWidth||window.innerWidth)-12;
     const s=Math.max(0.55,Math.min(1,avail/need));
     inner.style.transform='scale('+s.toFixed(3)+')';
-    hb.style.height=(inner.offsetHeight*s+18)+'px';
   }catch(e){}
-}
+} // v4.53: bar floats (position:fixed) — no band height to keep in sync
 function barReset(){ barSlots=[null,null,null,null,null]; barSeq=0; renderBar(); const bf=document.getElementById('barfull-overlay'); if(bf) bf.classList.remove('show'); }
 // v4.36: survivors always slide LEFT after a vanish/undo — occupied pockets on the left, empty ones on the right
 function compactBar(){
@@ -1152,12 +1490,12 @@ function flyToBar(fromRect, slotEl, typeId, done){
   const an=gh.animate(frames,{duration:430,easing:'linear'});
   an.onfinish=()=>{ try{gh.remove();}catch(e){} done&&done(); };
 }
-function onBarPick(tile){
+function onBarPick(tile, fromRectOverride){
   const freeSlot=barSlots.findIndex(s=>!s);
   if(freeSlot<0){ flashBar(); beep(150,0.08); vib(30); checkBarFull(); return; } // v4.38: no 6th-tile rescue — five filled pockets end the game
   if(!state.freeCache[tile.posIdx]){ tile.el.animate([{transform:'translateX(-3px)'},{transform:'translateX(3px)'},{transform:'translateX(0)'}],{duration:130}); beep(150,0.06); vib(25); return; }
-  let fromRect=null;
-  try{ fromRect=tile.el.getBoundingClientRect(); }catch(e){}
+  let fromRect=fromRectOverride||null;
+  try{ if(!fromRect) fromRect=tile.el.getBoundingClientRect(); }catch(e){}
   const it={posIdx:tile.posIdx, typeId:tile.typeId, seq:++barSeq, landed:false, vanishing:false, slot:freeSlot};
   barSlots[freeSlot]=it;
   const slot=barSlotEls()[freeSlot];
@@ -1365,7 +1703,7 @@ function win(){
   stopMusic(); // v4.41: fade the music out when the run ends
   clearInterval(state.timerId);
   const time=timerEl.textContent;
-  const result={layout:state.layoutKey, moves:state.moves, score:state.score, time:time, tester:testerName, date:new Date().toISOString(), lang:currentLang, texture:settings.textureSet, mode:settings.mode};
+  const result={layout:state.layoutKey, moves:state.moves, score:state.score, time:time, tester:testerName, date:new Date().toISOString(), lang:currentLang, texture:settings.textureSet, mode:settings.mode, level:(settings.mode==='bar5'?(state.structLevel||0):0)};
   let place=0, total=0;
   try{
     const arr=JSON.parse(localStorage.getItem('pm_results')||'[]');
@@ -1387,9 +1725,19 @@ function win(){
 const CONGRATS_CLIPS={en:{X:'congrats-en.mp3',10:'congrats-en-10.mp3',3:'congrats-en-3.mp3',1:'congrats-en-1.mp3'},
                       pl:{X:'congrats-pl.mp3',10:'congrats-pl-10.mp3',3:'congrats-pl-3.mp3',1:'congrats-pl-1.mp3'}};
 function winBar5(place,total){
+  // v4.52: level climb — beating the highest unlocked level unlocks the next one
+  let lvlNote='';
+  if(state.structLevel && state.structLevel===h5level){
+    if(h5level<LVL_TOTAL){
+      h5level++; try{ localStorage.setItem('pm_h5level',String(h5level)); }catch(e){}
+      barLevelSel=h5level; saveBarSel();
+      lvlNote=t('lvlNext',{n:h5level});
+    } else lvlNote=t('lvlMax');
+  }
   const tier=place===1?1:(place>0&&place<=3?3:(place>0&&place<=10?10:0));
   const key=tier===1?'congrats1':(tier===3?'congrats3':(tier===10?'congrats10':'congratsX'));
-  overlay(t(key), t('winPlaceTxt',{score:state.score, place:place||'—', total:total||'—'}), false);
+  overlay(t(key), t('winPlaceTxt',{score:state.score, place:place||'—', total:total||'—'})+lvlNote, false);
+  try{ document.getElementById('overlay-title').classList.add('winbig'); }catch(e){} // v4.54: big golden congrats
   const p=document.getElementById('layout-picker'); p.innerHTML='';
   const bNew=document.createElement('button'); bNew.id='btn-wingame'; bNew.textContent=t('btnNewGame'); bNew.style.cssText='flex:1;min-width:130px';
   bNew.onclick=()=>{ hideO(); genGame('scatter'); };
@@ -1400,14 +1748,14 @@ function winBar5(place,total){
   if(place===1){ setTimeout(playFanfare,1300); goldConfetti(3000); }
 }
 function sayCongrats(tier,key){
-  if(!settings.soundEnabled || settings.volume===0) return;
+  if(!settings.soundEnabled || sfxVol()===0) return;
   const lang=(currentLang==='pl')?'pl':'en';
   const tk=tier===1?'1':(tier===3?'3':(tier===10?'10':'X'));
   const path='sounds/'+(CONGRATS_CLIPS[lang]||CONGRATS_CLIPS.en)[tk];
   try{
     let a=fireAudioCache[path];
     if(!a){ a=new Audio(path); a.preload='auto'; fireAudioCache[path]=a; }
-    a.volume=Math.max(0.05,Math.min(1,settings.volume/100));
+    a.volume=Math.max(0.05,Math.min(1,sfxVol()/100));
     try{ a.currentTime=0; }catch(e){}
     const pr=a.play();
     if(pr && pr.catch) pr.catch(()=>sayCongratsTTS(key));
@@ -1418,16 +1766,16 @@ function sayCongratsTTS(key){ // last-resort fallback if clips are missing
     const synth=window.speechSynthesis; if(!synth || typeof SpeechSynthesisUtterance==='undefined') return;
     const u=new SpeechSynthesisUtterance(t(key).replace(/^\S+\s/,'')); // strip leading emoji
     u.lang=(currentLang==='pl'?'pl-PL':'en-US');
-    u.pitch=0.85; u.rate=0.95; u.volume=Math.max(0.05,Math.min(1,settings.volume/100));
+    u.pitch=0.85; u.rate=0.95; u.volume=Math.max(0.05,Math.min(1,sfxVol()/100));
     synth.cancel(); synth.speak(u);
   }catch(e){}
 }
 function playFanfare(){ // ~2 s synthesized brass fanfare (no external file needed)
-  if(!settings.soundEnabled || settings.volume===0) return;
+  if(!settings.soundEnabled || sfxVol()===0) return;
   try{
     const ctx=getAudioCtx(); if(!ctx) return;
     const t0=ctx.currentTime+0.05;
-    const peak=Math.max(0.05,Math.min(1,settings.volume/100))*0.24;
+    const peak=Math.max(0.05,Math.min(1,sfxVol()/100))*0.24;
     const seq=[
       {f:523.25,t:0.00,d:0.15},{f:659.25,t:0.15,d:0.15},{f:783.99,t:0.30,d:0.15},{f:1046.50,t:0.45,d:0.32},
       {f:1046.50,t:0.90,d:1.05},{f:1318.51,t:0.90,d:1.05},{f:1567.98,t:0.90,d:1.05}
@@ -1465,13 +1813,13 @@ function goldConfetti(dur=3000){ // short falling golden confetti
   setTimeout(()=>pieces.forEach(pc=>pc.remove()), dur);
 }
 function overlay(tt,msg,show){ document.getElementById('overlay-title').textContent=tt; document.getElementById('overlay-msg').textContent=msg; const p=document.getElementById('layout-picker'); p.innerHTML=''; if(show || document.getElementById('overlay').dataset.force==='1'){ Object.keys(LAYOUTS).forEach(k=>{ const b=document.createElement('button'); b.textContent=getLayoutName(k); b.onclick=()=>{ hideO(); genGame(k); }; p.appendChild(b); }); } document.getElementById('overlay').classList.add('show'); }
-function hideO(){ document.getElementById('overlay').classList.remove('show'); document.getElementById('overlay').dataset.force='0'; document.getElementById('tester-input').style.display='none'; }
+function hideO(){ document.getElementById('overlay').classList.remove('show'); document.getElementById('overlay').dataset.force='0'; document.getElementById('tester-input').style.display='none'; try{ document.getElementById('overlay-title').classList.remove('winbig'); }catch(e){} }
 function getLayoutName(k){ return (I18N[currentLang].layouts[k]||I18N.en.layouts[k]||k); }
 function applyLang(lang){
   currentLang=lang; localStorage.setItem('pilematch_lang',lang);
   if(lang==='pl' && (!testerName || testerName==='Guest')){ testerName='Bogusia'; localStorage.setItem('pilematch_tester',testerName); }
   document.documentElement.lang=lang;
-  document.getElementById('app-title').textContent=t('appTitle');
+  const _at=document.getElementById('app-title'); if(_at) _at.textContent=t('appTitle'); // v4.52: header removed
   document.getElementById('lab-hint').textContent=t('btnHint');
   document.getElementById('lab-undo').textContent=t('btnUndo');
   document.getElementById('lab-shuffle').textContent=t('btnShuffle');
@@ -1494,8 +1842,7 @@ function applyLang(lang){
   buildSetGrid();
   document.getElementById('btn-new').textContent=t('newGame');
   document.getElementById('overlay-btn').textContent=t('playAgain');
-  document.getElementById('legal-note').innerHTML=t('legal');
-  document.getElementById('tester-badge').textContent='👩‍💻 '+t('testerLabel',{name:testerName});
+  const _tb=document.getElementById('tester-badge'); if(_tb) _tb.textContent='👩‍💻 '+t('testerLabel',{name:testerName});
   document.querySelectorAll('.langbtn').forEach(b=> b.classList.toggle('active', b.dataset.lang===lang));
   document.getElementById('zoom-hint').textContent=t('zoomHint');
   document.getElementById('settings-title').textContent=t('settingsTitle');
@@ -1507,12 +1854,16 @@ function applyLang(lang){
   document.getElementById('label-anim').textContent=t('anim');
   document.getElementById('btn-settings-close').textContent=t('close');
   document.getElementById('btn-settings-reset').textContent=t('reset');
-  document.getElementById('settings-note').textContent=t('settingsNote');
+  const _sn=document.getElementById('settings-note'); if(_sn) _sn.textContent=t('settingsNote'); // moved to 📋 Changes dialog
   const sll=document.getElementById('start-layout-lbl'); if(sll) sll.textContent=t('startLayoutLbl');
   const ssl=document.getElementById('start-set-lbl'); if(ssl) ssl.textContent=t('setLbl');
   const sbt=document.getElementById('btn-start'); if(sbt) sbt.textContent=t('startBtn');
+  const sbo=document.getElementById('btn-start-opts'); if(sbo) sbo.textContent=t('settingsTitle');
+  const bch=document.getElementById('btn-changes'); if(bch) bch.textContent=t('changesLbl');
+  const cht=document.getElementById('changes-title'); if(cht) cht.textContent=t('changesLbl');
+  const chc=document.getElementById('btn-changes-close'); if(chc) chc.textContent=t('close');
   const sti=document.getElementById('start-title'); if(sti) sti.textContent='🀄 '+t('appTitle');
-  buildStartLayouts(); updateStartBest(); syncStartMode();
+  buildStartLayouts(); updateStartBest(); syncStartMode(); if(typeof updateStartLevelLine==='function') updateStartLevelLine(); if(typeof updateFootStats==='function') updateFootStats();
   state.tiles.forEach(t=>{ if(t.el && !t.removed) t.el.innerHTML=getFace(t.typeId); });
   updateVisuals();
 }
@@ -1520,9 +1871,9 @@ function applyLang(lang){
 function syncStartMode(){
   document.querySelectorAll('.smodebtn').forEach(b=> b.classList.toggle('active', b.dataset.mode===settings.mode));
   const bar=(settings.mode==='bar5');
-  const lp=document.getElementById('start-layout-picker'); if(lp){ lp.style.opacity=bar?'0.38':'1'; lp.style.pointerEvents=bar?'none':'auto'; }
-  const lbl=document.getElementById('start-layout-lbl'); if(lbl) lbl.style.opacity=bar?'0.38':'';
+  const sec=document.getElementById('start-layout-sec'); if(sec){ sec.style.display=bar?'none':''; } // v4.52: Hold-5 plays levels, not layouts
   const best=document.getElementById('start-best'); if(best) best.style.display=bar?'none':'';
+  if(typeof updateStartLevelLine==='function') updateStartLevelLine();
 }
 document.querySelectorAll('.langbtn').forEach(b=> b.onclick=()=> applyLang(b.dataset.lang));
 document.querySelectorAll('.smodebtn').forEach(b=> b.onclick=()=>{ if(settings.mode!==b.dataset.mode){ settings.mode=b.dataset.mode; saveSettings(); syncStartMode(); beep(520,0.05); } else { syncStartMode(); } });
@@ -1533,15 +1884,28 @@ document.getElementById('btn-barfull-undo').onclick=()=>{ document.getElementByI
 document.getElementById('btn-barfull-shuffle').onclick=()=>{ document.getElementById('barfull-overlay').classList.remove('show'); doBarUndo(); doShuffle(); }; // v4.48: frees one pocket, then reshuffles — the prompt can't loop anymore
 document.getElementById('btn-barfull-close').onclick=()=>{ document.getElementById('barfull-overlay').classList.remove('show'); };
 document.querySelectorAll('.modebtn').forEach(b=> b.onclick=()=>{ if(settings.mode!==b.dataset.mode){ settings.mode=b.dataset.mode; saveSettings(); syncModeSeg(); genGame(state.layoutKey); beep(540,0.06); } });
+document.getElementById('btn-start-opts').onclick=()=>{ const o=document.getElementById('start-options'); const sh=o.style.display!=='block'; o.style.display=sh?'block':'none'; beep(sh?620:440,0.05); };
 document.getElementById('btn-start').onclick=()=>{ getAudioCtx(); try{ localStorage.setItem('pm_layout',startSel.layout); }catch(e){} document.getElementById('start-overlay').classList.remove('show'); beep(660,0.09); vib(30); genGame(startSel.layout); };
-document.getElementById('tester-badge').onclick=()=>{ const inp=document.getElementById('tester-input'); inp.value=testerName; inp.style.display='block'; document.getElementById('overlay').dataset.force='0'; overlay(t('testerLabel',{name:''}).replace(':',''), currentLang==='pl'?'Wpisz imię testerki. Dla PL domyślnie Bogusia':'Enter tester name',false); inp.focus(); };
-document.getElementById('tester-input').addEventListener('input',e=>{ testerName=e.target.value.trim()||(currentLang==='pl'?'Bogusia':'Guest'); localStorage.setItem('pilematch_tester',testerName); document.getElementById('tester-badge').textContent='👩‍💻 '+t('testerLabel',{name:testerName}); });
+const _tb2=document.getElementById('tester-badge'); if(_tb2) _tb2.onclick=()=>{ const inp=document.getElementById('tester-input'); inp.value=testerName; inp.style.display='block'; document.getElementById('overlay').dataset.force='0'; overlay(t('testerLabel',{name:''}).replace(':',''), currentLang==='pl'?'Wpisz imię testerki. Dla PL domyślnie Bogusia':'Enter tester name',false); inp.focus(); };
+document.getElementById('tester-input').addEventListener('input',e=>{ testerName=e.target.value.trim()||(currentLang==='pl'?'Bogusia':'Guest'); localStorage.setItem('pilematch_tester',testerName); const _tb3=document.getElementById('tester-badge'); if(_tb3) _tb3.textContent='👩‍💻 '+t('testerLabel',{name:testerName}); });
 document.getElementById('btn-settings').onclick=()=>{ document.getElementById('settings-overlay').classList.add('show'); document.getElementById('settings-tester-input').value=testerName; };
 document.getElementById('btn-settings-close').onclick=()=> document.getElementById('settings-overlay').classList.remove('show');
+document.getElementById('btn-changes').onclick=()=>{ document.getElementById('changes-text').textContent=t('legal'); document.getElementById('changes-overlay').classList.add('show'); beep(500,0.05); }; // v4.54
+document.getElementById('btn-changes-close').onclick=()=> document.getElementById('changes-overlay').classList.remove('show');
+document.getElementById('changes-overlay').addEventListener('click',e=>{ if(e.target.id==='changes-overlay') e.currentTarget.classList.remove('show'); });
 document.getElementById('settings-overlay').addEventListener('click',e=>{ if(e.target.id==='settings-overlay') e.currentTarget.classList.remove('show'); });
 document.getElementById('vol-slider').addEventListener('input',e=>{ settings.volume=parseInt(e.target.value); document.getElementById('vol-value').textContent=settings.volume+'%'; saveSettings(); beep(440,0.07); });
-document.getElementById('music-vol-slider').addEventListener('input',e=>{ settings.musicVolume=parseInt(e.target.value); document.getElementById('music-vol-value').textContent=settings.musicVolume+'%'; saveSettings(); if(settings.mode!=='bar5') return; if(settings.musicVolume===0){ stopMusic(); } else if(musicAudio && !musicAudio.paused){ fadeMusicTo(musicTargetVol(),250); } else { startMusic(); } });
-document.getElementById('amb-vol-slider').addEventListener('input',e=>{ settings.ambVol=parseInt(e.target.value); document.getElementById('amb-vol-value').textContent=settings.ambVol+'%'; saveSettings(); if(settings.mode!=='bar5') return; if(settings.ambVol===0){ stopAmbience(); } else if(amb.on){ syncAmbVol(); } else { startAmbience(); } });
+document.getElementById('music-vol-slider').addEventListener('input',e=>{ settings.musicVolume=parseInt(e.target.value); document.getElementById('music-vol-value').textContent=settings.musicVolume+'%'; saveSettings(); if(settings.mode!=='bar5') return; if(settings.musicVolume===0||settings.musicEnabled===false){ stopMusicOnly(); } else if(musicAudio && !musicAudio.paused){ fadeMusicTo(musicTargetVol(),250); } else { startMusic(); } });
+function syncVolChecks(){
+  [['vol-enable','volEnabled','vol-slider','vol-value'],['music-enable','musicEnabled','music-vol-slider','music-vol-value'],['amb-enable','ambEnabled','amb-vol-slider','amb-vol-value']].forEach(m=>{
+    const c=document.getElementById(m[0]); if(!c) return; c.checked=settings[m[1]]!==false;
+    [m[2],m[3]].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.toggle('vol-off', settings[m[1]]===false); });
+  });
+} // v4.52
+document.getElementById('vol-enable').addEventListener('change',e=>{ settings.volEnabled=e.target.checked; saveSettings(); syncVolChecks(); beep(520,0.06); });
+document.getElementById('music-enable').addEventListener('change',e=>{ settings.musicEnabled=e.target.checked; saveSettings(); syncVolChecks(); if(settings.mode!=='bar5') return; const on=settings.musicEnabled&&settings.musicVolume>0; if(!on){ stopMusicOnly(); } else if(musicAudio && !musicAudio.paused){ fadeMusicTo(musicTargetVol(),250); } else { startMusic(); } });
+document.getElementById('amb-enable').addEventListener('change',e=>{ settings.ambEnabled=e.target.checked; saveSettings(); syncVolChecks(); if(settings.mode!=='bar5') return; const on=settings.ambEnabled&&settings.ambVol>0; if(!on){ stopAmbience(); } else if(amb.on){ syncAmbVol(); } else { startAmbience(); } });
+document.getElementById('amb-vol-slider').addEventListener('input',e=>{ settings.ambVol=parseInt(e.target.value); document.getElementById('amb-vol-value').textContent=settings.ambVol+'%'; saveSettings(); if(settings.mode!=='bar5') return; if(settings.ambVol===0||settings.ambEnabled===false){ stopAmbience(); } else if(amb.on){ syncAmbVol(); } else { startAmbience(); } });
 document.getElementById('toggle-sound').onclick=function(){ settings.soundEnabled=!settings.soundEnabled; saveSettings(); this.classList.toggle('on',settings.soundEnabled); if(settings.soundEnabled) beep(600,0.08); };
 document.getElementById('toggle-vib').onclick=function(){ settings.vibEnabled=!settings.vibEnabled; saveSettings(); this.classList.toggle('on',settings.vibEnabled); if(settings.vibEnabled) vib(50); };
 document.getElementById('toggle-anim').onclick=function(){ settings.animationsEnabled=!settings.animationsEnabled; saveSettings(); this.classList.toggle('on',settings.animationsEnabled); };
@@ -1559,14 +1923,14 @@ document.getElementById('toggle-random-texture').onclick=function(){
 };
 document.getElementById('set-lang-en').onclick=()=> applyLang('en');
 document.getElementById('set-lang-pl').onclick=()=> applyLang('pl');
-document.getElementById('settings-tester-input').addEventListener('input',e=>{ testerName=e.target.value.trim()||(currentLang==='pl'?'Bogusia':'Guest'); localStorage.setItem('pilematch_tester',testerName); document.getElementById('tester-badge').textContent='👩‍💻 '+t('testerLabel',{name:testerName}); });
-document.getElementById('btn-settings-reset').onclick=()=>{ settings={volume:70,musicVolume:25,ambVol:20,soundEnabled:true,vibEnabled:true,animationsEnabled:true,perfMode:'fast',debugIds:false,textureSet:'hd36',randomTexture:false,badgeIcons:false,mode:'bar5'}; saveSettings(); applyLang(currentLang); createDOM(); computeFreeCache(); updateVisuals(); fitAndCenter(); };
+document.getElementById('settings-tester-input').addEventListener('input',e=>{ testerName=e.target.value.trim()||(currentLang==='pl'?'Bogusia':'Guest'); localStorage.setItem('pilematch_tester',testerName); const _tb4=document.getElementById('tester-badge'); if(_tb4) _tb4.textContent='👩‍💻 '+t('testerLabel',{name:testerName}); });
+document.getElementById('btn-settings-reset').onclick=()=>{ settings={volume:70,musicVolume:13,ambVol:8,volEnabled:true,musicEnabled:true,ambEnabled:true,soundEnabled:true,vibEnabled:true,animationsEnabled:true,perfMode:'fast',debugIds:false,textureSet:'hd36',randomTexture:false,badgeIcons:false,mode:'bar5'}; saveSettings(); applyLang(currentLang); createDOM(); computeFreeCache(); updateVisuals(); fitAndCenter(); };
 document.getElementById('btn-new').onclick=()=> genGame(state.layoutKey);
 document.getElementById('btn-undo').onclick=()=>{ if(settings.mode==='bar5') doBarUndo(); else doUndo(); };
 document.getElementById('btn-shuffle').onclick=doShuffle;
 document.getElementById('btn-hint').onclick=doHint;
 document.getElementById('btn-layout').onclick=()=>{ document.getElementById('overlay').dataset.force='1'; document.getElementById('tester-input').style.display='none'; overlay(t('chooseLayoutTitle'),t('chooseLayoutMsg'),true); };
-document.getElementById('overlay-btn').onclick=()=>{ const v=document.getElementById('tester-input').value.trim(); if(v){ testerName=v; localStorage.setItem('pilematch_tester',testerName); document.getElementById('tester-badge').textContent='👩‍💻 '+t('testerLabel',{name:testerName}); } hideO(); if(state.pairsLeft===0) genGame(state.layoutKey); };
+document.getElementById('overlay-btn').onclick=()=>{ const v=document.getElementById('tester-input').value.trim(); if(v){ testerName=v; localStorage.setItem('pilematch_tester',testerName); const _tb5=document.getElementById('tester-badge'); if(_tb5) _tb5.textContent='👩‍💻 '+t('testerLabel',{name:testerName}); } hideO(); if(state.pairsLeft===0) genGame(state.layoutKey); };
 
 // Results
 let resultsTab=null; // v4.47: results are split per mode; null = follow current game mode
@@ -1644,8 +2008,6 @@ boardWrap.addEventListener('touchmove',e=>{
 boardWrap.addEventListener('touchend',e=>{ if(e.touches.length===0){ gest.isPan=false; gest.isPinch=false; } else if(e.touches.length===1){ gest.isPinch=false; gest.isPan=true; gest.sx=e.touches[0].clientX - view.panX; gest.sy=e.touches[0].clientY - view.panY; } });
 let md=false,ms={x:0,y:0,px:0,py:0}; boardWrap.addEventListener('mousedown',e=>{ md=true; ms.x=e.clientX; ms.y=e.clientY; ms.px=view.panX; ms.py=view.panY; }); window.addEventListener('mousemove',e=>{ if(!md || (drag && drag.started)) return; view.panX=ms.px + (e.clientX-ms.x); view.panY=ms.py + (e.clientY-ms.y); clampPan(); applyTransform(); }); window.addEventListener('mouseup',()=>{ md=false; });
 boardWrap.addEventListener('wheel',e=>{ if(e.ctrlKey||e.metaKey){ e.preventDefault(); const d=e.deltaY>0?0.9:1.1; view.userScale=Math.max(0.45,Math.min(3.5,view.userScale*d)); applyTransform(); clampPan(); applyTransform(); } },{passive:false});
-document.getElementById('btn-zoom-in').onclick=()=>{ view.userScale=Math.min(3.5,view.userScale*1.25); applyTransform(); clampPan(); applyTransform(); showHint(true); };
-document.getElementById('btn-zoom-out').onclick=()=>{ view.userScale=Math.max(0.45,view.userScale/1.25); applyTransform(); clampPan(); applyTransform(); showHint(true); };
 document.getElementById('btn-zoom-reset').onclick=()=> fitAndCenter();
 window.addEventListener('resize',()=>{ fitAndCenter(); fitBar(); });
 
@@ -1666,18 +2028,71 @@ boardEl.addEventListener('pointermove',e=>{
       drag.started=true;
       gest.isPan=false; md=false;
       view.panX=drag.px0; view.panY=drag.py0; applyTransform();
-      drag.tile.el.classList.add('dragging');
+      if(settings.mode!=='bar5'){ drag.tile.el.classList.add('dragging'); }
+      else { drag.tile.el.classList.add('drag-src'); ensureDragGhost(drag.tile,e.clientX,e.clientY); } // v4.54: ghost above the bar
       drag.tile.el.style.transition='none';
       vib(10);
     } else return;
   }
-  const tot=view.fitScale*view.userScale;
-  drag.tile.el.style.transform=`translate(${(dx/tot).toFixed(1)}px,${(dy/tot).toFixed(1)}px) scale(1.07)`;
+  if(settings.mode!=='bar5'){
+    const tot=view.fitScale*view.userScale;
+    drag.tile.el.style.transform=`translate(${(dx/tot).toFixed(1)}px,${(dy/tot).toFixed(1)}px) scale(1.07)`;
+  } else {
+    moveDragGhost(e.clientX,e.clientY);
+  }
+  if(settings.mode==='bar5') highlightBarSlot(barTargetIdx(e.clientX,e.clientY)); // v4.53: glowing pocket under the dragged stone
 });
+// v4.54: the dragged stone is a fixed-position ghost — renders ABOVE the floating bar, never behind it
+let dragGhost=null, dragGhostSc=1;
+function ensureDragGhost(tile,x,y){
+  if(dragGhost) return dragGhost;
+  const cs=getComputedStyle(document.documentElement);
+  const natW=parseFloat(cs.getPropertyValue('--tile-w'))||84, natH=parseFloat(cs.getPropertyValue('--tile-h'))||110;
+  const r=tile.el.getBoundingClientRect();
+  dragGhostSc=Math.max(0.35,(r.width||natW)/natW)*1.06;
+  const g=document.createElement('div');
+  g.className='drag-ghost';
+  g.innerHTML='<div style="width:'+natW+'px;height:'+natH+'px;transform-origin:0 0;transform:scale('+dragGhostSc.toFixed(3)+')">'+getFace(tile.typeId)+'</div>';
+  document.body.appendChild(g);
+  dragGhost=g;
+  moveDragGhost(x,y);
+  return g;
+}
+function moveDragGhost(x,y){ if(!dragGhost) return; dragGhost.style.transform='translate('+(x)+'px,'+(y)+'px) translate(-50%,-112%)'; }
+function dropDragGhost(){ if(dragGhost){ try{ dragGhost.remove(); }catch(e){} dragGhost=null; } }
+// v4.53: drag & drop onto the marble bar — the first auto-sorted empty pocket glows
+function barTargetIdx(x,y){
+  if(settings.mode!=='bar5') return -3;
+  const inner=document.getElementById('hold-bar-inner'); if(!inner) return -3;
+  let r; try{ r=inner.getBoundingClientRect(); }catch(e){ return -3; }
+  const pad=18;
+  if(x<r.left-pad||x>r.right+pad||y<r.top-pad||y>r.bottom+pad) return -3; // not over the bar
+  return barSlots.findIndex(s=>!s); // insertion pocket per auto-sort (-1 when full)
+}
+function highlightBarSlot(idx){
+  document.querySelectorAll('#hold-bar-inner .hslot').forEach((el,i)=>el.classList.toggle('droptarget', idx>=0 && i===idx));
+}
 function endDrag(e){
   if(!drag.tile||e.pointerId!==drag.pid) return;
   const tile=drag.tile;
   if(drag.started){
+    if(settings.mode==='bar5'){
+      const idx=barTargetIdx(e.clientX,e.clientY);
+      highlightBarSlot(-1);
+      let ghostRect=null;
+      if(dragGhost){ try{ ghostRect=dragGhost.getBoundingClientRect(); }catch(err){} }
+      dropDragGhost();
+      tile.el.classList.remove('drag-src');
+      tile.el.style.transition='';
+      tile.el.style.transform='';
+      if(idx!==-3){ // dropped over the bar — onBarPick places it (or flashes when full), flying from the ghost's last spot
+        onBarPick(tile, ghostRect);
+        tile._suppressClick=true; setTimeout(()=>{ tile._suppressClick=false; },130);
+        vib(14);
+        drag={tile:null,started:false,pid:null,sx:0,sy:0,px0:0,py0:0,t0:0};
+        return;
+      }
+    }
     tile.el.style.transition='transform .27s cubic-bezier(.25,1,.35,1)';
     tile.el.style.transform='';
     tile.el.classList.remove('dragging');
@@ -1723,8 +2138,8 @@ applyPerfMode();
 document.getElementById('tester-input').value=testerName;
 document.getElementById('settings-tester-input').value=testerName;
 applyLang(currentLang);
-buildStartLayouts(); updateStartBest(); syncSetGrid(); syncStartMode(); updateVisuals();
-document.getElementById('start-overlay').classList.add('show');
+buildStartLayouts(); updateStartBest(); syncSetGrid(); syncStartMode(); if(typeof updateFootStats==='function') updateFootStats(); updateVisuals();
+playIntro(); // v4.53: intro first, start prompt right after (tap to skip)
 window.__pm={state,pairKey,onClick,computeFreeCache,spawnScoreFx,setScore,scheduleNoMovesCheck,checkNoMoves,genGame,doShuffle,onBarPick,doBarUndo,get bar(){return barSlots}};
 </script>
 </body>
